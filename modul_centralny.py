@@ -4,14 +4,14 @@ from modul_obliczeniowy import *
 
 class skrypt(funkcje):
     
-    def __init__(self, model='grs80', zapis=False, posrednie=False, nazwa='', X='', Y='', Z='', f='', l='', h='', X2='', Y2='', Z2='', s_elip='', A='', z ='', x2000='', y2000='', x1992='', y1992='', xgk='', ygk=''):
+    def __init__(self, model='grs80', zapis=False, posrednie=False, nazwa='', X='', Y='', Z='', f='', l='', h='', X2='', Y2='', Z2='', s_elip='', A='', z ='', x2000='', y2000='', x1992='', y1992='', xgk='', ygk='', f2='', l2='', h2=''):
         
         self.__elipsoida(model) #wybor elipsoidy
         # self.__zapiszplik(zapis, nazwa) #wybor zapisu do pliku txt     
         self.posrednie = posrednie #definiuje czy ma wypluwac obliczenia posrednie
         
         #zamiana podanych danych na liste
-        dane = [X, Y, Z, f, l, h, X2, Y2, Z2, s_elip, A, z, x2000, y2000, x1992, y1992, xgk, ygk]
+        dane = [X, Y, Z, f, l, h, X2, Y2, Z2, s_elip, A, z, x2000, y2000, x1992, y1992, xgk, ygk, f2, l2, h2]
         dane_ost = []
         for wartosc in dane:
             if type(wartosc) == list:
@@ -38,9 +38,12 @@ class skrypt(funkcje):
         self.y1992 = dane_ost[15]
         self.xgk = dane_ost[16]
         self.ygk = dane_ost[17]
+        self.f2 = dane_ost[18]
+        self.l2 = dane_ost[19]
+        self.h2 = dane_ost[20]
         
         #zamiana stopni na radiany           
-        dane_kat = [self.f, self.l, self.A, self.z]
+        dane_kat = [self.f, self.l, self.A, self.z, self.f2, self.l2]
         dane_kat_ost = []
         for wartosc_lista in dane_kat:
             wartosc_ost = []
@@ -63,6 +66,8 @@ class skrypt(funkcje):
         self.l = dane_kat_ost[1]
         self.A = dane_kat_ost[2]
         self.z = dane_kat_ost[3]
+        self.f2 = dane_kat_ost[4]
+        self.l2 = dane_kat_ost[5]
          
     def __elipsoida(self, model):
         #wybor elipsoidy
@@ -243,20 +248,20 @@ class skrypt(funkcje):
      
     def odwrotne(self): #algorytm vincentego      
         
-        A_st = []; A_2_st = []
+        A_st = []; A2_st = []
         s_elip_ost = []
         i = 0
         
-        if self.f != [''] and self.l != [''] and self.f_2 != [''] and self.l_2 != ['']:
+        if self.f != [''] and self.l != [''] and self.f2 != [''] and self.l2 != ['']:
             
             while i < len(self.f):
                 
-                s_elip, A, A_2 = self.vincenty(self.f[i], self.l[i], self.f_2[i], self.l_2[i], self.a, self.e2)
-                A_st.append(self.dms(A)); A_2_st.append(self.dms(A_2))
+                s_elip, A, A2 = self.vincenty(self.f[i], self.l[i], self.f2[i], self.l2[i], self.a, self.e2)
+                A_st.append(self.dms(A)); A2_st.append(self.dms(A2))
                 s_elip_ost.append(s_elip)
                 i += 1
         
-        print( '\nA1: ',('{} '*len(A_st)).format(*A_st), '\nA2: ',('{} '*len(A_2_st)).format(*A_2_st), '\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost), '[m]')
+        print( '\nA1: ',('{} '*len(A_st)).format(*A_st), '\nA2: ',('{} '*len(A2_st)).format(*A2_st), '\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost), '[m]')
             
 if __name__=='__main__':
     
@@ -271,3 +276,6 @@ if __name__=='__main__':
     
     proba4 = skrypt(s_elip=43000.0,A=230,f='54 7 20.79937',l='23 0 26.12508')
     proba4.wprost()
+    
+    proba5 = skrypt(f='54 7 20.79937',l='23 0 26.12508',f2='53 52 23.05857',l2='22 30 23.24978')
+    proba5.odwrotne()
