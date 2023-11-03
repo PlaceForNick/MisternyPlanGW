@@ -192,25 +192,23 @@ class funkcje():
     def kivioj(self,f,l,A,s,a,e2): #wspolrzedne PUNKTU A
         n = int(s/1000)
         ds = s/n
-        c1 = Np(f,a,e2) * np.cos(f) * np.sin(A)
+        c1 = self.Np(f,a,e2) * np.cos(f) * np.sin(A)
         for i in range(n):
-            M = Mp(f,a,e2)
-            N = Np(f,a,e2)
+            M = self.Mp(f,a,e2)
+            N = self.Np(f,a,e2)
             df = ds * np.cos(A)/M
             dA = ds * np.sin(A) * np.tan(f) / N
             fm = f + df/2
             Am = A + dA/2
-    #        Mm = (a * (1 - e2))/(np.sqrt((1 - e2 * (np.sin(fm))**2)**3))
-     #       Nm = a/(np.sqrt(1 - e2 * (np.sin(fm))**2))
-            Mm = Mp(fm,a,e2)
-            Nm = Np(fm,a,e2)
+            Mm = self.Mp(fm,a,e2)
+            Nm = self.Np(fm,a,e2)
             dfm = (ds * np.cos(Am))/Mm
             dAm = (ds * np.sin(Am) * np.tan(fm))/Nm
             dlm = (ds * np.sin(Am))/(Nm * np.cos(fm))
             f = f + dfm
             l = l + dlm
             A = A + dAm
-            c2 = Np(f,a,e2) * np.cos(f) * np.sin(A)
+            c2 = self.Np(f,a,e2) * np.cos(f) * np.sin(A)
         A = A + pi
         if A > 2*pi:
             A = A - 2*pi
@@ -240,12 +238,10 @@ class funkcje():
         B = (u2/1024) * (256 + u2 * (-128 + u2 * (74 - 47 * u2)))
         d_sigma = B * sin_sigma * (cos2_sigma_m + ((1/4) * B * ((cos_sigma * (-1+2*cos2_sigma_m**2) - ((1/6) * B * cos2_sigma_m * (-3 + 4*sin_sigma**2) * (-3 + 4 * cos2_sigma_m**2))))))   
         sab = b * A * (sigma - d_sigma)
-        Aab = np.arctan2((np.cos(Ub) * np.sin(L)) , (( np.cos(Ua) * np.sin(Ub)) - (np.sin(Ua) * np.cos(Ub) * np.cos(L))))# + pi
+        Aab = np.arctan2((np.cos(Ub) * np.sin(L)) , (( np.cos(Ua) * np.sin(Ub)) - (np.sin(Ua) * np.cos(Ub) * np.cos(L))))
         Aba = np.arctan2((np.cos(Ua) * np.sin(L)) , ((-np.sin(Ua) * np.cos(Ub)) + (np.cos(Ua) * np.sin(Ub) * np.cos(L)))) + pi
         if Aab > 2*pi:
             Aba = Aba - 2*pi
-    #    if Aba > 2*pi:
-    #        Aab = Aab - 2*pi
         if Aba < 0:
             Aba = Aba + 2*pi
         if Aab < 0:
