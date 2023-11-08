@@ -87,7 +87,19 @@ class skrypt(funkcje):
         self.e2 = (2 * self.splasz - self.splasz ** 2)
         
     def flh(self):
-         
+        '''
+        Przelicza do ukladu wspolrzednych krzywoliniowych flh na podstawie dostepnych danych:
+            -XYZ
+            -PL2000
+            -PL1992
+
+        Returns
+        -------
+        f [deg]
+        l [deg]
+        h [m]
+
+        '''   
         f_st = []; l_st = []
         f_ost = []; l_ost = []
         h_ost = []
@@ -128,7 +140,19 @@ class skrypt(funkcje):
         return(f_ost,l_ost,h_ost)
     
     def XYZ(self):
-        
+        '''
+        Przelicza do ukladu wspolrzednych prostokatnych XYZ na podstawie dostepnych danych:
+            -flh
+            -PL2000
+            -PL1992
+
+        Returns
+        -------
+        X [m]
+        Y [m]
+        Z [m]
+
+        '''
         X_ost = []; Y_ost = []; Z_ost = []
         i = 0
         
@@ -163,7 +187,18 @@ class skrypt(funkcje):
         return(X_ost,Y_ost,Z_ost)
     
     def PL2000(self):
-        
+        '''
+        Przelicza do ukladu wspolrzednych PL2000 na podstawie dostepnych danych:
+            -XYZ
+            -fl
+            -PL1992
+
+        Returns
+        -------
+        x2000 [m]
+        y2000 [m]
+
+        '''
         x_ost = []; y_ost = []
         i = 0
         
@@ -237,8 +272,18 @@ class skrypt(funkcje):
         print( '\nx2000: ',('{:.3f} '*len(x_ost)).format(*x_ost), '[m]\ny2000: ',('{:.3f} '*len(y_ost)).format(*y_ost), '[m]' )
         return(x_ost,y_ost)
         
-    def wprost(self): #algorytm kivioja
-        
+    def wprost(self):
+        '''
+        Wykonuje zadanie wprost przy uzyciu ALGORYTMU KIVIOJA na podstawie dostepnych danych:
+            -fl, A, s_elip
+
+        Returns
+        -------
+        f2 [deg]
+        l2 [deg]
+        A2 [deg]
+
+        '''
         f_st = []; l_st = []; A_st =[]
         f_ost = []; l_ost = []; A_ost=[]
         i = 0
@@ -255,8 +300,18 @@ class skrypt(funkcje):
         print( '\n\u03C62: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB2: ',('{} '*len(l_st)).format(*l_st), '\nA2: ',('{} '*len(A_st)).format(*A_st))
         return(f_ost,l_ost,A_ost)
      
-    def odwrotne(self): #algorytm vincentego      
-        
+    def odwrotne(self):
+        '''
+        Wykonuje zadanie odwrotne przy uzyciu ALGORYTMU VINCENTEGO na podstawie dostepnych danych:
+            -fl, fl2
+
+        Returns
+        -------
+        A [deg]
+        A2 [deg]
+        s_elip [m]
+
+        '''
         A_st = []; A2_st = []
         A_ost = []; A2_ost = []
         s_elip_ost = []
@@ -276,6 +331,8 @@ class skrypt(funkcje):
         return(A_ost,A2_ost,s_elip_ost)  
         
 if __name__=='__main__':
+    
+    # T E S T Y 
     
     proba1 = skrypt(x1992=100, y1992=7400000)
     proba1.flh()

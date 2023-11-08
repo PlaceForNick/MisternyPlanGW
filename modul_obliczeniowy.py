@@ -189,7 +189,27 @@ class funkcje():
         R = Rneu(f, l)
         return(R.T @ dX)
         
-    def kivioj(self,f,l,A,s,a,e2): #wspolrzedne PUNKTU A
+    def kivioj(self,f,l,A,s,a,e2): #wspolrzednje PUNKTU A
+        '''
+        Sluzy do liczenia zadania wprost przy uzyciu algorytmu kivioja.
+        Przelicza wspl pkt poczatkowego na wspl pkt koncowego
+
+        Parameters
+        ----------
+        f : wspl fi pkt poczatkowego (szerokosc geo.) [rad]
+        l : wspl lambda pkt koncowego  (dlugosc geo.) [rad]
+        A : azymut wprost (poczatek-koniec) [rad]
+        s : dl lini geodezyjnej (odleglosc elipsoidalna) [m]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+
+        Returns
+        -------
+        f : wspl fi pkt koncowego(szerokosc geo.) [rad]
+        l : wspl lambda pkt koncowego (dlugosc geo.) [rad]
+        A : azymut odwrotny (koniec-poczatek) [rad]
+
+        '''
         n = int(s/1000)
         ds = s/n
         c1 = self.Np(f,a,e2) * np.cos(f) * np.sin(A)
@@ -215,6 +235,27 @@ class funkcje():
         return(f,l,A,c1,c2)  #wspolrzednje PUNKTU B
     
     def vincenty(self,fa,la,fb,lb,a,e2):
+        '''
+        Sluzy do liczenia zadania odwrotnego przy uzyciu algorytmu vincentego.
+        Przelicza wspl pkt poczatkowego i koncowego na azymut i linie geodezyjna.
+
+
+        Parameters
+        ----------
+        fa : wspl fi pkt poczatkowego (szerokosc geo.) [rad]
+        la : wspl lambda pkt koncowego  (dlugosc geo.) [rad]
+        fb : wspl fi pkt koncowego (szerokosc geo.) [rad]
+        lb : wspl lambda pkt koncowego (dlugosc geo.) [rad]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+
+        Returns
+        -------
+        s : dl lini geodezyjnej (odleglosc elipsoidalna) [m]
+        Aab : azymut wprost (poczatek-koniec) [rad]
+        Aba : azymut odwrotny (koniec-poczatek) [rad]
+
+        '''
         b = a * np.sqrt(1 - e2)
         fl = 1 - (b / a) #splaszczenie
         Ua = np.arctan((1 - fl) * np.tan(fa)) #szer zredukowana pkt A
