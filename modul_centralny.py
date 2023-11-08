@@ -206,20 +206,7 @@ class skrypt(funkcje):
             
             while i < len(self.f):
                 
-                if self.l[i] < radians(16.5) and self.l[i] > radians(13.5): #ns = 5
-                    l0 = radians(15)
-                    ns = 5
-                elif self.l[i] < radians(19.5) and self.l[i] > radians(16.5): #ns = 6
-                    l0 = radians(18)
-                    ns = 6
-                elif self.l[i] < radians(22.5) and self.l[i] > radians(19.5): #ns = 7
-                    l0 = radians(21)
-                    ns = 7
-                elif self.l[i] < radians(25.5) and self.l[i] > radians(22.5): #ns = 8
-                    l0 = radians(24)
-                    ns = 8
-                    
-                x2000,y2000,xgk,ygk = self.fl2PL2000(self.f[i], self.l[i], self.a, self.e2, ns)
+                x2000,y2000,xgk,ygk = self.fl2PL2000(self.f[i], self.l[i], self.a, self.e2, self.strefa(self.l[i]))
                 x_ost.append(x2000); y_ost.append(y2000)
                 i += 1
                 
@@ -228,21 +215,7 @@ class skrypt(funkcje):
             while i < len(self.X):
                 
                 f,l,h = self.xyz2flh(self.X[i], self.Y[i], self.Z[i], self.a, self.e2)
-                
-                if l < radians(16.5) and l > radians(13.5): #ns = 5
-                    l0 = radians(15)
-                    ns = 5
-                elif l < radians(19.5) and l > radians(16.5): #ns = 6
-                    l0 = radians(18)
-                    ns = 6
-                elif l < radians(22.5) and l > radians(19.5): #ns = 7
-                    l0 = radians(21)
-                    ns = 7
-                elif l < radians(25.5) and l > radians(22.5): #ns = 8
-                    l0 = radians(24)
-                    ns = 8
-                 
-                x2000,y2000,xgk,ygk = self.fl2PL2000(f, l, self.a, self.e2, ns)
+                x2000,y2000,xgk,ygk = self.fl2PL2000(f, l, self.a, self.e2, self.strefa(l))
                 x_ost.append(x2000); y_ost.append(y2000)
                 i += 1
                 
@@ -251,25 +224,56 @@ class skrypt(funkcje):
             while i < len(self.x1992):
                 
                 f,l,xgk,ygk = self.PL19922fl(self.x1992[i], self.y1992[i], self.a, self.e2)
-                
-                if l < radians(16.5) and l > radians(13.5): #ns = 5
-                    l0 = radians(15)
-                    ns = 5
-                elif l < radians(19.5) and l > radians(16.5): #ns = 6
-                    l0 = radians(18)
-                    ns = 6
-                elif l < radians(22.5) and l > radians(19.5): #ns = 7
-                    l0 = radians(21)
-                    ns = 7
-                elif l < radians(25.5) and l > radians(22.5): #ns = 8
-                    l0 = radians(24)
-                    ns = 8
-                 
-                x2000,y2000,xgk,ygk = self.fl2PL2000(f, l, self.a, self.e2, ns)
+                x2000,y2000,xgk,ygk = self.fl2PL2000(f, l, self.a, self.e2, self.strefa(l))
                 x_ost.append(x2000); y_ost.append(y2000)
                 i += 1
                 
         print( '\nx2000: ',('{:.3f} '*len(x_ost)).format(*x_ost), '[m]\ny2000: ',('{:.3f} '*len(y_ost)).format(*y_ost), '[m]' )
+        return(x_ost,y_ost)
+    
+    def PL1992(self):
+        '''
+        Przelicza do ukladu wspolrzednych PL2000 na podstawie dostepnych danych:
+            -XYZ
+            -fl
+            -PL2000
+
+        Returns
+        -------
+        x1992 [m]
+        y1992 [m]
+
+        '''
+        x_ost = []; y_ost = []
+        i = 0
+        
+        if self.f != [''] and self.l != ['']:
+            
+            while i < len(self.f):
+                
+                x1992,y1992,xgk,ygk = self.fl2PL1992(self.f[i], self.l[i], self.a, self.e2)
+                x_ost.append(x1992); y_ost.append(y1992)
+                i += 1
+                
+        elif self.X != [''] and self.Y != [''] and self.Z != ['']:
+            
+            while i < len(self.X):
+                
+                f,l,h = self.xyz2flh(self.X[i], self.Y[i], self.Z[i], self.a, self.e2)
+                x1992,y1992,xgk,ygk = self.fl2PL1992(f, l, self.a, self.e2)
+                x_ost.append(x1992); y_ost.append(y1992)
+                i += 1
+                
+        elif self.x2000 != [''] and self.y2000 != ['']:
+            
+            while i < len(self.x2000):
+                
+                f,l,xgk,ygk = self.PL20002fl(self.x2000[i], self.y2000[i], self.a, self.e2, self.strefa2(self.y2000[i]))
+                x1992,y1992,xgk,ygk = self.fl2PL1992(f, l, self.a, self.e2)
+                x_ost.append(x1992); y_ost.append(y1992)
+                i += 1    
+                
+        print( '\nx1992: ',('{:.3f} '*len(x_ost)).format(*x_ost), '[m]\ny1992: ',('{:.3f} '*len(y_ost)).format(*y_ost), '[m]' )
         return(x_ost,y_ost)
         
     def wprost(self):
@@ -348,5 +352,8 @@ if __name__=='__main__':
     
     proba5 = skrypt(f='54 7 20.79937',l='23 0 26.12508',f2='53 52 23.05857',l2='22 30 23.24978')
     proba5.odwrotne()
+    
+    proba6 = skrypt(x2000=5763554.505, y2000=5569082.651)
+    proba6.PL1992()
     
     

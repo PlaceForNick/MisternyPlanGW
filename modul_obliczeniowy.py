@@ -314,8 +314,8 @@ class funkcje():
         dl = l - l0
         t = tan(f)
         n2 = ep2 * cos(f)**2
-        N = Np(f,a,e2)
-        sigm = sigma(f,a,e2)
+        N = self.Np(f,a,e2)
+        sigm = self.sigma(f,a,e2)
         xgk = sigm + (dl**2/2) * N * sin(f)*cos(f)*(1 + (dl**2/12)*cos(f)**2*(5-t**2+9*n2+4*n2**2)+ ((dl**4)/360)*cos(f)**4*(61 - 58*t**2 + t**4 + 270*n2 - 330*n2*t**2))
         ygk = dl*N*cos(f)*(1+(dl**2/6)*cos(f)**2*(1 - t**2 + n2) + (dl**4/120)*cos(f)**4*(5 - 18*t**2 + t**4 + 14*n2 - 58*n2*t**2))
         x92 = xgk * m0 - 5300000
@@ -389,6 +389,57 @@ class funkcje():
         y2000 = ygk * m0 + ns * 1000000 + 500000
         return(x2000,y2000,xgk,ygk)
     
+    def strefa(self,l):
+        '''
+        Automatycznie wybiera strefe odwzorowawcza dla ukladu wspolrzednych PL2000
+
+        Parameters
+        ----------
+        l : wspl lambda (dlugosc geo.) [rad]
+
+        Returns
+        -------
+        ns : nr strefy [-]
+
+        '''
+        if l < radians(16.5) and l > radians(13.5): #ns = 5
+            l0 = radians(15)
+            ns = 5
+        elif l < radians(19.5) and l > radians(16.5): #ns = 6
+            l0 = radians(18)
+            ns = 6
+        elif l < radians(22.5) and l > radians(19.5): #ns = 7
+            l0 = radians(21)
+            ns = 7
+        elif l < radians(25.5) and l > radians(22.5): #ns = 8
+            l0 = radians(24)
+            ns = 8
+        else:
+            raise NotImplementedError('Wyznaczona strefa jest nieprawidlowa dla odwzorowania PL2000.'
+                                      'Sprawdz poprawnosc wspolrzednej l. Podana wartosc to:'
+                                      f'l = {self.dms(l)}')
+        return(ns)
+    
+    def strefa2(self,y2000):
+        '''
+        Automatycznie wybiera strefe odwzorowawcza dla ukladu wspolrzednych PL2000
+
+        Parameters
+        ----------
+        y2000 : wspl y w ukladdzie PL2000 [m]
+
+        Returns
+        -------
+        ns : nr strefy [-]
+
+        '''
+        ns = str(y2000)[0]
+        if ns != '5' and '6' and '7' and '8':
+            raise NotImplementedError('Wyznaczona strefa jest nieprawidlowa dla odwzorowania PL2000.'
+                                      'Sprawdz poprawnosc wspolrzednej y2000. Podana wartosc to:'
+                                      f'y2000 = {y2000:0.3f}')
+        return(int(ns))
+            
     def PL20002fl(self,x20,y20,a,e2,ns,m0 = 0.999923):
         if ns == 5:
             l0 = radians(15)
