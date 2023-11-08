@@ -89,6 +89,7 @@ class skrypt(funkcje):
     def flh(self):
          
         f_st = []; l_st = []
+        f_ost = []; l_ost = []
         h_ost = []
         i = 0   
         
@@ -98,6 +99,7 @@ class skrypt(funkcje):
                 
                 f,l,h = self.xyz2flh(self.X[i], self.Y[i], self.Z[i], self.a, self.e2)
                 f_st.append(self.dms(f)); l_st.append(self.dms(l))
+                f_ost.append(np.rad2deg(f)); l_ost.append(np.rad2deg(l))
                 h_ost.append(h)
                 i += 1
         
@@ -108,6 +110,7 @@ class skrypt(funkcje):
                 ns = int(str(self.y2000[i])[0])
                 f,l,xgk,ygk = self.PL20002fl(self.x2000[i], self.y2000[i], self.a, self.e2, ns)
                 f_st.append(self.dms(f)); l_st.append(self.dms(l))
+                f_ost.append(np.rad2deg(f)); l_ost.append(np.rad2deg(l))
                 h_ost = self.h
                 i += 1
         
@@ -117,11 +120,13 @@ class skrypt(funkcje):
 
                 f,l,xgk,ygk = self.PL19922fl(self.x1992[i], self.y1992[i], self.a, self.e2)
                 f_st.append(self.dms(f)); l_st.append(self.dms(l))
+                f_ost.append(np.rad2deg(f)); l_ost.append(np.rad2deg(l))
                 h_ost = self.h
                 i += 1
 
         print('\n\u03C6: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB: ',('{} '*len(l_st)).format(*l_st), '\nh: ',('{} '*len(h_ost)).format(*h_ost), '[m]')
-        
+        return(f_ost,l_ost,h_ost)
+    
     def XYZ(self):
         
         X_ost = []; Y_ost = []; Z_ost = []
@@ -155,7 +160,8 @@ class skrypt(funkcje):
                 i += 1
                 
         print( '\nX: ',('{:.3f} '*len(X_ost)).format(*X_ost), '[m]\nY: ',('{:.3f} '*len(Y_ost)).format(*Y_ost), '[m]\nZ: ',('{:.3f} '*len(Z_ost)).format(*Z_ost), '[m]' )
-
+        return(X_ost,Y_ost,Z_ost)
+    
     def PL2000(self):
         
         x_ost = []; y_ost = []
@@ -229,10 +235,12 @@ class skrypt(funkcje):
                 i += 1
                 
         print( '\nx2000: ',('{:.3f} '*len(x_ost)).format(*x_ost), '[m]\ny2000: ',('{:.3f} '*len(y_ost)).format(*y_ost), '[m]' )
+        return(x_ost,y_ost)
         
     def wprost(self): #algorytm kivioja
         
         f_st = []; l_st = []; A_st =[]
+        f_ost = []; l_ost = []; A_ost=[]
         i = 0
         
         if self.f != [''] and self.l != [''] and self.A != [''] and self.s_elip != ['']:
@@ -241,14 +249,16 @@ class skrypt(funkcje):
                 
                 f_2,l_2,A_2 = self.kivioj(self.f[i], self.l[i], self.A[i], self.s_elip[i], self.a, self.e2)[0:3]
                 f_st.append(self.dms(f_2)); l_st.append(self.dms(l_2)); A_st.append(self.dms(A_2))
+                f_ost.append(np.rad2deg(f_2)); l_ost.append(np.rad2deg(l_2)); A_ost.append(np.rad2deg(A_2))
                 i += 1
                 
         print( '\n\u03C62: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB2: ',('{} '*len(l_st)).format(*l_st), '\nA2: ',('{} '*len(A_st)).format(*A_st))
-
+        return(f_ost,l_ost,A_ost)
      
     def odwrotne(self): #algorytm vincentego      
         
         A_st = []; A2_st = []
+        A_ost = []; A2_ost = []
         s_elip_ost = []
         i = 0
         
@@ -258,11 +268,13 @@ class skrypt(funkcje):
                 
                 s_elip, A, A2 = self.vincenty(self.f[i], self.l[i], self.f2[i], self.l2[i], self.a, self.e2)
                 A_st.append(self.dms(A)); A2_st.append(self.dms(A2))
+                A_ost.append(np.rad2deg(A)); A2_ost.append(np.rad2deg(A2))
                 s_elip_ost.append(s_elip)
                 i += 1
         
         print( '\nA1: ',('{} '*len(A_st)).format(*A_st), '\nA2: ',('{} '*len(A2_st)).format(*A2_st), '\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost), '[m]')
-            
+        return(A_ost,A2_ost,s_elip_ost)  
+        
 if __name__=='__main__':
     
     proba1 = skrypt(x1992=100, y1992=7400000)
@@ -279,3 +291,5 @@ if __name__=='__main__':
     
     proba5 = skrypt(f='54 7 20.79937',l='23 0 26.12508',f2='53 52 23.05857',l2='22 30 23.24978')
     proba5.odwrotne()
+    
+    
