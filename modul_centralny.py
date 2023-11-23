@@ -184,7 +184,7 @@ class skrypt(funkcje):
                 X_ost.append(X); Y_ost.append(Y); Z_ost.append(Z)
                 i += 1
                 
-        print( '\nX: ',('{:.3f} '*len(X_ost)).format(*X_ost), '[m]\nY: ',('{:.3f} '*len(Y_ost)).format(*Y_ost), '[m]\nZ: ',('{:.3f} '*len(Z_ost)).format(*Z_ost), '[m]' )
+        print('\nX: ',('{:.3f} '*len(X_ost)).format(*X_ost), '[m]\nY: ',('{:.3f} '*len(Y_ost)).format(*Y_ost), '[m]\nZ: ',('{:.3f} '*len(Z_ost)).format(*Z_ost), '[m]' )
         return(X_ost,Y_ost,Z_ost)
     
     def PL2000(self):
@@ -336,11 +336,28 @@ class skrypt(funkcje):
         return(A_ost,A2_ost,s_elip_ost)  
      
     def neu(self):
+        '''
+        Przelicza wspl pkt 1 na wspl pkt 2 w ukl flh oraz XYZ,
+        przy uzyciu ukl wspl topocentrycznych NEU na podstawie dostepnych danych:
+            -flh, saz
+            -XYZ, saz
+
+        Returns
+        -------
+        X [m]
+        Y [m]
+        Z [m]
+        f [deg]
+        l [deg]
+        h [m]
+        
+
+        '''
         
         f2_st = []; l2_st = []
         f2_ost = []; l2_ost = []
         h2_ost = []
-        XYZ = []
+        X2_ost = []; Y2_ost = []; Z2_ost = []
         i = 0
         
         if self.f != [''] and self.l != [''] and self.h != ['']:
@@ -357,6 +374,7 @@ class skrypt(funkcje):
                 f2_st.append(self.dms(f2)); l2_st.append(self.dms(l2))
                 f2_ost.append(np.rad2deg(f2)); l2_ost.append(np.rad2deg(l2))
                 h2_ost.append(h2)
+                X2_ost.append(X2); Y2_ost.append(Y2); Z2_ost.append(Z2)
                 i += 1
                 
         if self.X != [''] and self.Y != [''] and self.Z != ['']:
@@ -373,10 +391,12 @@ class skrypt(funkcje):
                 f2_st.append(self.dms(f2)); l2_st.append(self.dms(l2))
                 f2_ost.append(np.rad2deg(f2)); l2_ost.append(np.rad2deg(l2))
                 h2_ost.append(h2)
+                X2_ost.append(X2); Y2_ost.append(Y2); Z2_ost.append(Z2)
                 i += 1
 
-        print('\n\u03C62: ',('{} '*len(f2_st)).format(*f2_st), '\n\u03BB2: ',('{} '*len(l2_st)).format(*l2_st), '\nh2: ',('{:.3f} '*len(h2_ost)).format(*h2_ost), '[m]')
-        return(f2_ost,l2_ost,h2_ost)
+        print('\n\u03C62: ',('{} '*len(f2_st)).format(*f2_st), '\n\u03BB2: ',('{} '*len(l2_st)).format(*l2_st), '\nh2: ',('{:.3f} '*len(h2_ost)).format(*h2_ost), '[m]'
+              '\nX2: ',('{:.3f} '*len(X2_ost)).format(*X2_ost), '[m]\nY2: ',('{:.3f} '*len(Y2_ost)).format(*Y2_ost), '[m]\nZ2: ',('{:.3f} '*len(Z2_ost)).format(*Z2_ost), '[m]')
+        return(f2_ost,l2_ost,h2_ost,X2_ost,Y2_ost,Z2_ost)
                
         
         
