@@ -2,9 +2,17 @@ import numpy as np
 from math import *
 from modul_obliczeniowy import *
 
+class Format:
+    normal = '\033[0m'
+    podkresl = '\033[4m'
+        
 class skrypt(funkcje):
     
+    ID = 0
+    
     def __init__(self, model='grs80', zapis=False, posrednie=False, nazwa='', X='', Y='', Z='', f='', l='', h='', X2='', Y2='', Z2='', s='', A='', z ='', x2000='', y2000='', x1992='', y1992='', xgk='', ygk='', f2='', l2='', h2='', s_elip=''):
+
+        skrypt.ID += 1
         
         self.__elipsoida(model) #wybor elipsoidy
         # self.__zapiszplik(zapis, nazwa) #wybor zapisu do pliku txt     
@@ -69,7 +77,8 @@ class skrypt(funkcje):
         self.z = dane_kat_ost[3]
         self.f2 = dane_kat_ost[4]
         self.l2 = dane_kat_ost[5]
-         
+
+    
     def __elipsoida(self, model):
         #wybor elipsoidy
         if    model  == 'kra':
@@ -137,7 +146,7 @@ class skrypt(funkcje):
                 h_ost = self.h
                 i += 1
 
-        print('\n\u03C6: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB: ',('{} '*len(l_st)).format(*l_st), '\nh: ',('{} '*len(h_ost)).format(*h_ost), '[m]')
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [flh]:' + Format.normal + '\n\u03C6: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB: ',('{} '*len(l_st)).format(*l_st), '\nh: ',('{} '*len(h_ost)).format(*h_ost), '[m]')
         return(f_ost,l_ost,h_ost)
     
     def XYZ(self):
@@ -184,7 +193,7 @@ class skrypt(funkcje):
                 X_ost.append(X); Y_ost.append(Y); Z_ost.append(Z)
                 i += 1
                 
-        print('\nX: ',('{:.3f} '*len(X_ost)).format(*X_ost), '[m]\nY: ',('{:.3f} '*len(Y_ost)).format(*Y_ost), '[m]\nZ: ',('{:.3f} '*len(Z_ost)).format(*Z_ost), '[m]' )
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [XYZ]:' + Format.normal + '\nX: ',('{:.3f} '*len(X_ost)).format(*X_ost), '[m]\nY: ',('{:.3f} '*len(Y_ost)).format(*Y_ost), '[m]\nZ: ',('{:.3f} '*len(Z_ost)).format(*Z_ost), '[m]' )
         return(X_ost,Y_ost,Z_ost)
     
     def PL2000(self):
@@ -229,7 +238,7 @@ class skrypt(funkcje):
                 x_ost.append(x2000); y_ost.append(y2000)
                 i += 1
                 
-        print( '\nx2000: ',('{:.3f} '*len(x_ost)).format(*x_ost), '[m]\ny2000: ',('{:.3f} '*len(y_ost)).format(*y_ost), '[m]' )
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [PL2000]:' + Format.normal + '\nx2000: ',('{:.3f} '*len(x_ost)).format(*x_ost), '[m]\ny2000: ',('{:.3f} '*len(y_ost)).format(*y_ost), '[m]' )
         return(x_ost,y_ost)
     
     def PL1992(self):
@@ -274,7 +283,7 @@ class skrypt(funkcje):
                 x_ost.append(x1992); y_ost.append(y1992)
                 i += 1    
                 
-        print( '\nx1992: ',('{:.3f} '*len(x_ost)).format(*x_ost), '[m]\ny1992: ',('{:.3f} '*len(y_ost)).format(*y_ost), '[m]' )
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [PL1992]:' + Format.normal + '\nx1992: ',('{:.3f} '*len(x_ost)).format(*x_ost), '[m]\ny1992: ',('{:.3f} '*len(y_ost)).format(*y_ost), '[m]' )
         return(x_ost,y_ost)
         
     def wprost(self):
@@ -302,7 +311,7 @@ class skrypt(funkcje):
                 f_ost.append(np.rad2deg(f_2)); l_ost.append(np.rad2deg(l_2)); A_ost.append(np.rad2deg(A_2))
                 i += 1
                 
-        print( '\n\u03C62: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB2: ',('{} '*len(l_st)).format(*l_st), '\nA2: ',('{} '*len(A_st)).format(*A_st))
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [wprost]:' + Format.normal + '\n\u03C62: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB2: ',('{} '*len(l_st)).format(*l_st), '\nA2: ',('{} '*len(A_st)).format(*A_st))
         return(f_ost,l_ost,A_ost)
      
     def odwrotne(self):
@@ -332,7 +341,7 @@ class skrypt(funkcje):
                 s_elip_ost.append(s_elip)
                 i += 1
         
-        print( '\nA1: ',('{} '*len(A_st)).format(*A_st), '\nA2: ',('{} '*len(A2_st)).format(*A2_st), '\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost), '[m]')
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [odwrotne]:' + Format.normal + '\nA1: ',('{} '*len(A_st)).format(*A_st), '\nA2: ',('{} '*len(A2_st)).format(*A2_st), '\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost), '[m]')
         return(A_ost,A2_ost,s_elip_ost)  
      
     def neu(self):
@@ -394,20 +403,18 @@ class skrypt(funkcje):
                 X2_ost.append(X2); Y2_ost.append(Y2); Z2_ost.append(Z2)
                 i += 1
 
-        print('\n\u03C62: ',('{} '*len(f2_st)).format(*f2_st), '\n\u03BB2: ',('{} '*len(l2_st)).format(*l2_st), '\nh2: ',('{:.3f} '*len(h2_ost)).format(*h2_ost), '[m]'
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [neu]:' + Format.normal + 
+              '\n\u03C62: ',('{} '*len(f2_st)).format(*f2_st), '\n\u03BB2: ',('{} '*len(l2_st)).format(*l2_st), '\nh2: ',('{:.3f} '*len(h2_ost)).format(*h2_ost), '[m]'
               '\nX2: ',('{:.3f} '*len(X2_ost)).format(*X2_ost), '[m]\nY2: ',('{:.3f} '*len(Y2_ost)).format(*Y2_ost), '[m]\nZ2: ',('{:.3f} '*len(Z2_ost)).format(*Z2_ost), '[m]')
         return(f2_ost,l2_ost,h2_ost,X2_ost,Y2_ost,Z2_ost)
                
-        
-        
-        
 if __name__=='__main__':
     
     # T E S T Y 
     
     proba1 = skrypt(x1992=100, y1992=7400000)
     proba1.flh()
-    
+
     proba2 = skrypt(x2000=100, y2000=7400000, h=100)
     proba2.XYZ()
     
