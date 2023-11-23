@@ -4,14 +4,14 @@ from modul_obliczeniowy import *
 
 class skrypt(funkcje):
     
-    def __init__(self, model='grs80', zapis=False, posrednie=False, nazwa='', X='', Y='', Z='', f='', l='', h='', X2='', Y2='', Z2='', s_elip='', A='', z ='', x2000='', y2000='', x1992='', y1992='', xgk='', ygk='', f2='', l2='', h2=''):
+    def __init__(self, model='grs80', zapis=False, posrednie=False, nazwa='', X='', Y='', Z='', f='', l='', h='', X2='', Y2='', Z2='', s='', A='', z ='', x2000='', y2000='', x1992='', y1992='', xgk='', ygk='', f2='', l2='', h2='', s_elip=''):
         
         self.__elipsoida(model) #wybor elipsoidy
         # self.__zapiszplik(zapis, nazwa) #wybor zapisu do pliku txt     
         self.posrednie = posrednie #definiuje czy ma wypluwac obliczenia posrednie
         
         #zamiana podanych danych na liste
-        dane = [X, Y, Z, f, l, h, X2, Y2, Z2, s_elip, A, z, x2000, y2000, x1992, y1992, xgk, ygk, f2, l2, h2]
+        dane = [X, Y, Z, f, l, h, X2, Y2, Z2, s, A, z, x2000, y2000, x1992, y1992, xgk, ygk, f2, l2, h2, s_elip]
         dane_ost = []
         for wartosc in dane:
             if type(wartosc) == list:
@@ -29,7 +29,7 @@ class skrypt(funkcje):
         self.X2 = dane_ost[6]
         self.Y2 = dane_ost[7]
         self.Z2 = dane_ost[8]
-        self.s_elip = dane_ost[9]
+        self.s = dane_ost[9]
         self.A = dane_ost[10]
         self.z = dane_ost[11]
         self.x2000 = dane_ost[12]
@@ -41,6 +41,7 @@ class skrypt(funkcje):
         self.f2 = dane_ost[18]
         self.l2 = dane_ost[19]
         self.h2 = dane_ost[20]
+        self.s_elip = dane_ost[21]
         
         #zamiana stopni na radiany           
         dane_kat = [self.f, self.l, self.A, self.z, self.f2, self.l2]
@@ -333,6 +334,52 @@ class skrypt(funkcje):
         
         print( '\nA1: ',('{} '*len(A_st)).format(*A_st), '\nA2: ',('{} '*len(A2_st)).format(*A2_st), '\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost), '[m]')
         return(A_ost,A2_ost,s_elip_ost)  
+     
+    def neu(self):
+        
+        f2_st = []; l2_st = []
+        f2_ost = []; l2_ost = []
+        h2_ost = []
+        XYZ = []
+        i = 0
+        
+        if self.f != [''] and self.l != [''] and self.h != ['']:
+            
+            while i < len(self.A):
+                
+                X,Y,Z = self.flh2xyz(self.f[i], self.l[i], self.h[i], self.a, self.e2)
+                DeltaNEU = self.saz2neu(self.s[i], self.A[i], self.z[i])
+                DeltaXYZ = self.neu2xyz(DeltaNEU, self.f[i], self.l[i])
+                X2 = X + DeltaXYZ[0]
+                Y2 = Y + DeltaXYZ[1]
+                Z2 = Z + DeltaXYZ[2]
+                f2,l2,h2 = self.xyz2flh(X2, Y2, Z2, self.a, self.e2)
+                f2_st.append(self.dms(f2)); l2_st.append(self.dms(l2))
+                f2_ost.append(np.rad2deg(f2)); l2_ost.append(np.rad2deg(l2))
+                h2_ost.append(h2)
+                i += 1
+                
+        if self.X != [''] and self.Y != [''] and self.Z != ['']:
+            
+            while i < len(self.A):
+                
+                f,l,h = self.xyz2flh(self.X[i], self.Y[i], self.Z[i], self.a, self.e2)
+                DeltaNEU = self.saz2neu(self.s[i], self.A[i], self.z[i])
+                DeltaXYZ = self.neu2xyz(DeltaNEU, f, l)
+                X2 = self.X[i] + DeltaXYZ[0]
+                Y2 = self.Y[i] + DeltaXYZ[1]
+                Z2 = self.Z[i] + DeltaXYZ[2]
+                f2,l2,h2 = self.xyz2flh(X2, Y2, Z2, self.a, self.e2)
+                f2_st.append(self.dms(f2)); l2_st.append(self.dms(l2))
+                f2_ost.append(np.rad2deg(f2)); l2_ost.append(np.rad2deg(l2))
+                h2_ost.append(h2)
+                i += 1
+
+        print('\n\u03C62: ',('{} '*len(f2_st)).format(*f2_st), '\n\u03BB2: ',('{} '*len(l2_st)).format(*l2_st), '\nh2: ',('{:.3f} '*len(h2_ost)).format(*h2_ost), '[m]')
+        return(f2_ost,l2_ost,h2_ost)
+               
+        
+        
         
 if __name__=='__main__':
     

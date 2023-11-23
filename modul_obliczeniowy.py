@@ -30,8 +30,6 @@ class funkcje():
         d = int(x)
         m = int((x - d) *  60)
         s = (x - d - (m/60)) * 3600
-        # print(znak, "%3d°%2d'%8.5f''" % (d, m, s))
-        # return (d,m,s)
         return(f"{znak}{d:3d}\u00B0{m:2d}'{s:8.5f}''")
     
     def fromdms(self,X):
@@ -162,18 +160,62 @@ class funkcje():
         return(x,y,z) 
        
     def saz2neu(self,s, alfa, z):
+        '''
+        Oblicza wspl w ukladzie topocentrycznym neu
+
+        Parameters
+        ----------
+        s : dlugosc wektora delta neu [m]
+        alfa : azymut (kat miedzy wektorem n oraz przekatna tworzona przez wetory n,e) [rad]
+        z : kat zenitalny (kat miedzy przekatna tworzona przez wetory n,e) oraz prosta s) [rad]
+
+        Returns
+        -------
+        dneu : Wektor przesuniecia neu (3x0) [m]
+
+        '''
         dneu = np.array([s * np.sin(z) * np.cos(alfa),
                          s * np.sin(z) * np.sin(alfa),
                          s * np.cos(z)])
         return(dneu)
     
-    def neu2saz(self,dx):
-        s = np.sqrt(dx @ dx)
-        alfa = np.arctan2(dx[1],dx[2])
-        z = np.arccos(dx[2]/s)
+    def neu2saz(self,dneu):
+        '''
+        Oblicza parametry definiujace uklad wspl topocentrycznych neu
+
+        Parameters
+        ----------
+        dneu : Wektor przesuniecia neu (3x0) [m]
+
+        Returns
+        -------
+        s : dlugosc wektora delta neu [m]
+        alfa : azymut (kat miedzy wektorem n oraz przekatna tworzona przez wetory n,e) [rad]
+        z : kat zenitalny (kat miedzy przekatna tworzona przez wetory n,e) oraz prosta s) [rad]
+
+        '''
+        s = np.sqrt(dneu @ dneu)
+        alfa = np.arctan2(dneu[1],dneu[2])
+        z = np.arccos(dneu[2]/s)
         return(s,alfa,z)
     
     def Rneu(self,f, l):
+        '''
+        Liczy macierz obrotu R, gdzie:
+            - 1 kolumna stanowi wektor n
+            - 1 kolumna stanowi wektor e
+            - 1 kolumna stanowi wektor u
+
+        Parameters
+        ----------
+        f : wspl fi (szerokosc geo.) [rad]
+        l : wspl lambda (dlugosc geo.) [rad]
+
+        Returns
+        -------
+        R : macierz obrotu (3x3)
+
+        '''
         R = np.array([[-np.sin(f) * np.cos(l), -np.sin(l), np.cos(f) * np.cos(l)],
                       [-np.sin(f) * np.sin(l), np.cos(l), np.cos(f) * np.sin(l)],
                       [np.cos(f), 0. ,np.sin(f)]])
@@ -181,12 +223,40 @@ class funkcje():
         
     
     def neu2xyz(self,dneu, f, l):
-        R = Rneu(f, l)
+        '''
+        liczy wektor przesuniecia delta XYZ (3x0) [m]
+
+        Parameters
+        ----------
+        dneu : Wektor przesuniecia neu (3x0) [m]
+        f : wspl fi (szerokosc geo.) [rad]
+        l : wspl lambda (dlugosc geo.) [rad]
+
+        Returns
+        -------
+        dX : Wektor przesuniecia XYZ (3x0) [m] 
+
+        '''
+        R = self.Rneu(f, l)
         dXYZ = R @ dneu
         return(dXYZ)
     
     def xyz2neu(self,dX,f,l):
-        R = Rneu(f, l)
+        '''
+        liczy wektor przesuniecia delta neu (3x0) [m]
+
+        Parameters
+        ----------
+        dX : Wektor przesuniecia XYZ (3x0) [m] 
+        f : wspl fi (szerokosc geo.) [rad]
+        l : wspl lambda (dlugosc geo.) [rad]
+
+        Returns
+        -------
+        dneu : Wektor przesuniecia neu (3x0) [m] 
+
+        '''
+        R = self.Rneu(f, l)
         return(R.T @ dX)
         
     def kivioj(self,f,l,A,s,a,e2): #wspolrzednje PUNKTU A
