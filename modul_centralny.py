@@ -145,8 +145,12 @@ class skrypt(funkcje):
                 f_ost.append(np.rad2deg(f)); l_ost.append(np.rad2deg(l))
                 h_ost = self.h
                 i += 1
-
-        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [flh]:' + Format.normal + '\n\u03C6: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB: ',('{} '*len(l_st)).format(*l_st), '\nh: ',('{} '*len(h_ost)).format(*h_ost), '[m]')
+        
+        if h_ost != ['']:
+            print(Format.podkresl + f'\nZapytanie {skrypt.ID} [flh]:' + Format.normal + '\n\u03C6: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB: ',('{} '*len(l_st)).format(*l_st), '\nh: ',('{:.3f} '*len(h_ost)).format(*h_ost), '[m]')
+        else:
+            print(Format.podkresl + f'\nZapytanie {skrypt.ID} [flh]:' + Format.normal + '\n\u03C6: ',('{} '*len(f_st)).format(*f_st), '\n\u03BB: ',('{} '*len(l_st)).format(*l_st))
+ 
         return(f_ost,l_ost,h_ost)
     
     def XYZ(self):
