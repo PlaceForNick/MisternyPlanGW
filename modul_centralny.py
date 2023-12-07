@@ -18,6 +18,9 @@ class skrypt(funkcje):
         # self.__zapiszplik(zapis, nazwa) #wybor zapisu do pliku txt     
         self.posrednie = posrednie #definiuje czy ma wypluwac obliczenia posrednie
         
+        self.m0_1992 = 0.9996
+        self.m0_2000 = 0.999923
+        
         #zamiana podanych danych na liste
         dane = [X, Y, Z, f, l, h, X2, Y2, Z2, s, A, z, x2000, y2000, x1992, y1992, xgk, ygk, f2, l2, h2, s_elip]
         dane_ost = []
@@ -414,6 +417,49 @@ class skrypt(funkcje):
               '\nX2: ',('{:.3f} '*len(X2_ost)).format(*X2_ost), '[m]\nY2: ',('{:.3f} '*len(Y2_ost)).format(*Y2_ost), '[m]\nZ2: ',('{:.3f} '*len(Z2_ost)).format(*Z2_ost), '[m]')
         return(f2_ost,l2_ost,h2_ost,X2_ost,Y2_ost,Z2_ost)
                
+    def Azymut(self):
+        A_ost = []
+        A_st = []
+        i = 0
+        
+        if self.x1992 != [''] and self.y1992 != [] and self.x1992_2 != [''] and self.y1992_2 != ['']:
+            
+            l0 = np.radians(19)
+            while i < len(self.x1992):
+                #do zmiany/popr
+                self.xgk.append((self.x1992 + 5300000)/self.m0_1992)
+                self.ygk.append((self.y1992 - 500000)/self.m0_1992)                
+                self.xgk2.append((self.x1992_2 + 5300000)/self.m0_1992)
+                self.ygk2.append((self.y1992_2 - 500000)/self.m0_1992)
+        
+        elif self.x2000 != [''] and self.y2000 != [] and self.x2000_2 != [''] and self.y2000_2 != ['']:
+            
+            
+            while i < len(self.x2000):
+                #do zmiany/popr
+                self.xgk.append((self.x2000 + 5300000)/self.m0_1992)
+                self.ygk.append((self.y2000 - 500000)/self.m0_1992)
+                self.xgk2.append((self.x2000_2 + 5300000)/self.m0_1992)
+                self.ygk2.append((self.y2000_2 - 500000)/self.m0_1992)
+                
+        if self.xgk != [''] and self.ygk != [''] and self.xgk2 != [''] and self.ygk2 != ['']:
+            
+            while i < len(self.f):
+                #krok 2 - policzenie azymutu (kierunku) na plaszczyznie gk:
+                alfa_ab = np.arctan2(self.ygk2[i]-self.ygk[i],self.xgk2[i]-self.xgk[i])
+
+                #krok 3 - policzenie zbieznosci pld:
+                gamma_a = self.zbiez_pld(self.xgk[i], self.ygk[i], a, e2)
+                
+                #krok 4 - policzenie redukcji kierunku:
+                l0 = np.radians(18) #idk co z tym zrobic jak bd podane wspl w gk
+                delta_ab = self.zbiez_kier(self.xgk[i], self.ygk[i], self.xgk2[i], self.ygk2[i], a, e2, l0)
+                
+                A_ab = alfa_ab + delta_ab + gamma_a
+
+                i += 1
+            
+            
 if __name__=='__main__':
     
     # T E S T Y 
@@ -435,5 +481,8 @@ if __name__=='__main__':
     
     proba6 = skrypt(x2000=5763554.505, y2000=5569082.651)
     proba6.PL1992()
+    
+    proba7 = skrypt(x2000 = 5906044.038,y2000 = 6481105.250,x2000_2 = 5895976.242,y2000_2 = 6498384.639)
+    proba7.Azymut()
     
     
