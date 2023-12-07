@@ -420,8 +420,8 @@ class funkcje():
         dl=la-l0
         t=tan(fa)
         n2=e_2*cos(fa)**2
-        N=Np(fa,a,e2)
-        sigm=sigma(fa,a, e2)
+        N=self.Np(fa,a,e2)
+        sigm=self.sigma(fa,a, e2)
         x=sigm+(dl**2/2)*N*sin(fa)*cos(fa)*(1+(dl**2/12)*(cos(fa))**2*(5-t**2+9*n2+4*n2**2)+(dl**4/360)*(cos(fa))**4*(61-58*t**2+t**4+270*n2-330*n2*t**2))
         y=dl*N*cos(fa)*(1+(dl**2/6)*(cos(fa))**2*(1-t**2+n2)+(dl**4/120)*(cos(fa))**4*(5-18*t**2+t**4+14*n2-58*n2*t**2))
         return(x,y)
@@ -469,12 +469,12 @@ class funkcje():
         fl=x/(a*A0)
         while True:
             fs=fl
-            sigm=sigma(fl,a,e2)
+            sigm=self.sigma(fl,a,e2)
             fl=fl+(x-sigm)/(a*A0)
             if abs( fl-fs)<(0.000001/206265):
                 break
-        N=Np(fl,a,e2)
-        M=Mp(fl,a,e2)
+        N=self.Np(fl,a,e2)
+        M=self.Mp(fl,a,e2)
         t=tan(fl)
         n2=e_2*(cos(fl)**2)
         f= fl - (((y**2) * t)/(2 * M * N)) * (1 - ((y**2)/(12*N**2)) * (5 + 3 * t**2 + n2 - 9 * n2 * t**2 - 4 * n2**2) + ((y**4)/(360 * N**4)) * (61 + 90 * t**2 + 45 * t**4))
@@ -630,17 +630,6 @@ class funkcje():
         m = 1 + ygk**2 / (2 * R**2) + ygk**4 / (24 * R**4)
         return(m)
     
-    # def red_gk(xa,ya,xb,yb,a,e2,l0 = radians(19)):
-    #     xm = (xa + xb)/2
-    #     ym = (ya + yb)/2
-    #     fm,lm = GK2fl(xm,ym,a,e2,l0)
-    #     Rm2 = Mp(fm,a,e2) * Np(fm,a,e2)
-    #     print(np.sqrt(Rm2))
-    #     sgk = np.sqrt((xa-xb)**2 + (ya-yb)**2)
-    #     r = sgk * (ya**2 + ya*yb + yb**2)/(6 * Rm2)
-    #     selip = sgk - r
-    #     return(r,selip,sgk)
-    
     def red_gk(self,xa,ya,xb,yb,ns,a,e2):
         xm = (xa + xb)/2
         ym = (ya + yb)/2
@@ -689,8 +678,23 @@ class funkcje():
         return(s0, Xp, Yp)
     
     def zbiez_pld(self,xgk,ygk,a,e2):
-        fi1 = f1(xgk,a,e2)
-        N1 = Np(fi1,a,e2)
+        '''
+        liczy zbierznosc poludnikow gamma dla danego pkt
+
+        Parameters
+        ----------
+        xgk: wspl x w G-K [m]
+        ygk: wspl y w G-K [m]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+
+        Returns
+        -------
+        gamma: kat zbieznosci poludnikow w pkt [rad]
+
+        '''
+        fi1 = self.f1(xgk,a,e2)
+        N1 = self.Np(fi1,a,e2)
         t = tan(fi1)
         b2 = a**2*(1-e2)
         ep2 = (a**2 - b2)/b2
@@ -698,40 +702,33 @@ class funkcje():
         gamma = (ygk / N1) * t * (1 - (ygk**2 / (3 * N1**2)) * (1 + t**2 - n2 - 2 * n2**2) + (ygk**4 / (15 * N1**4)) * (2 + 5 * t**2 + 3 * t**4))
         return(gamma)
     
-    # def zbiez_pld(xgk,ygk,a,e2):
-    #     fii = f1(xgk, a, e2)
-    #     N1 = Np(fii, a, e2)
-    #     b2 = a**2 * (1-e2) 
-    #     e2p = ( a**2 - b2 ) / b2 
-    #     t1 = np.tan(fii)
-    #     ni = np.sqrt(e2p * (np.cos(fii))**2)
-    #     #g = ygk/N1*t1*(1 - (ygk)**2/3*(N1**2)*(1 + t1**2 - ni**2 -2*ni**2) + (ygk**4/15*N1**4)*(2 + 5*t1**2 + 3*t1**4))
-    #     g = ygk/Np(fii,a,e2) * t1 * (1 - ygk**2/(3*Np(fii,a,e2)**2) * (1 + t1**2 - ni - 2 * ni**2) + ygk**4/(15*Np(fii,a,e2)**4 *(2 + 5 * t1**2 + 3 * t1**4)))
-    #     return(g) #gamma
-    
     def zbiez_kier(self,xa,ya,xb,yb,a,e2,l0):
+        '''
+        liczy zbierznosc (redukcje) kierunkow delta dla pkt na linii AB
+
+        Parameters
+        ----------
+        xa : wspl x pkt A w G-K [m]
+        ya : wspl y pkt A w G-K [m]
+        xb : wspl x pkt B w G-K [m]
+        yb : wspl y pkt B w G-K [m]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+        l0 : poludnik zerowy [rad]
+
+        Returns
+        -------
+        delta - zbieznosc kierunkow w pkt A dla linii AB [rad]
+
+        '''
         xm = (xa + xb)/2
         ym = (ya + yb)/2
-        fm,lm = GK2fl(xm,ym,a,e2,l0)
-        M = Mp(fm,a,e2) 
-        N = Np(fm,a,e2)
+        fm,lm = self.GK2fl(xm,ym,a,e2,l0)
+        M = self.Mp(fm,a,e2) 
+        N = self.Np(fm,a,e2)
         Rm2 = M*N
-        delta = ((xb - xa) * (2 * ya + yb)) / (6 * Rm2) # redukcja kierunku
-        # dab = ((xb - xa)*(2*ya + yb))/(6*Rm2)
-        # print(dab)
-        # dba = ((xa - xb)*(2*yb + ya))/(6 *Rm2)
+        delta = ((xb - xa) * (2 * ya + yb)) / (6 * Rm2)
         return(delta)
-    
-    # def zbiez_kier(xa,ya,xb,yb,l0,a,e2):
-    #     x = (xa + xb)/2
-    #     y = (ya + yb)/2
-    #     f,l = GK2fl(x, y, l0, a, e2)
-    #     M = Mp(f,a,e2) 
-    #     N = Np(f,a,e2)
-    #     R = np.sqrt(M*N)
-    #     dab = (xb - xa)*(2*ya + yb)/(6*R**2)
-    #     dba = (xa - xb)*(2*yb + ya)/(6 *R**2)
-    #     return(dab,dba) #deltaAB deltaBA
     
     def azymut(self,xa,ya,xb,yb):
         alfa_ab = np.arctan(((yb - ya) / (xb - xa)))
@@ -743,8 +740,6 @@ class funkcje():
         return(alfa_ab,alfa_ba)
     
     def redukcja_AZ(self,xa,ya,xb,yb,dAb,dBa,a,e2):
-        # dAb = zbiez_kier(xa,ya,xb,yb,l0,a,e2)
-        # dBa = zbiez_kier(xb,yb,xa,ya,l0,a,e2)
         alfa_ab, alfa_ba = azymut(xa,ya,xb,yb)
         AAb = alfa_ab + zbiez_pld(xa, ya, a, e2) + dAb
         ABa = alfa_ba + zbiez_pld(xb, yb, a, e2) + dBa
