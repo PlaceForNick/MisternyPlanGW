@@ -60,6 +60,8 @@ class skrypt(funkcje):
             while True:
                 try:
                     wartosc = wartosc_lista[i]
+                    if type(wartosc) == list:
+                        wartosc = wartosc[0]
                     if wartosc =='':
                         wartosc = wartosc
                     elif type(wartosc) == str:

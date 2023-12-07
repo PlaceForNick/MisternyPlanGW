@@ -379,6 +379,28 @@ class funkcje():
         return(f)
     
     def fl2PL1992(self,f,l,a,e2,l0=radians(19), m0 = 0.9993):
+        '''
+        Przelicza wspl elispoidalne f,l na do ukl wspl plaskich Gasussa-Krugera lub/i ukl wspl plaskich PL-1992
+
+        Parameters
+        ----------
+        f : wspl fi (szerokosc geo.) [rad]
+        l : wspl lambda (dlugosc geo.) [rad]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+        l0 : wartosc poludnika zerowego odwzorownia PL-1992 [rad]
+             The default is radians(19).
+        m0 : wspolczynnik skali odwzorowania PL-1992
+             The default is 0.9993.
+
+        Returns
+        -------
+        x92: wspl x w PL-1992 [m]
+        y92: wspl y w PL-1992 [m]
+        xgk: wspl x w G-K [m]
+        ygk: wspl y w G-K [m]
+
+        '''
         b2 = a**2*(1 - e2)
         ep2 = (a**2 - b2)/b2
         dl = l - l0
@@ -405,6 +427,28 @@ class funkcje():
         return(x,y)
     
     def PL19922fl(self,x,y,a,e2,l0=radians(19),m0=0.9993):
+        '''
+        Przelicza wspl w ukl wspl plaskich PL-1992 do wspl elipsoidalnych f,l lub/i wspl w ukl wspl plaskich Gaussa-Krugera x,y
+
+        Parameters
+        ----------
+        x: wspl x w PL-1992 [m]
+        y: wspl y w PL-1992 [m]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+        l0 : wartosc poludnika zerowego odwzorownia PL-1992 [rad]
+             The default is radians(19).
+        m0 : wspolczynnik skali odwzorowania PL-1992
+             The default is 0.9993.
+
+        Returns
+        -------
+        f : wspl fi (szerokosc geo.) [rad]
+        l : wspl lambda (dlugosc geo.) [rad]
+        xgk: wspl x w G-K [m]
+        ygk: wspl y w G-K [m]
+        
+        '''
         xgk = (x + 5300000)/m0
         ygk = (y - 500000)/m0
         fi1 = self.f1(xgk,a,e2)
@@ -438,6 +482,30 @@ class funkcje():
         return(f,l)
        
     def fl2PL2000(self,f,l,a,e2,ns,m0= 0.999923):
+        '''
+        Przelicza wspl elispoidalne f,l na do ukl wspl plaskich Gasussa-Krugera lub/i ukl wspl plaskich PL-2000
+
+        Parameters
+        ----------
+        f : wspl fi (szerokosc geo.) [rad]
+        l : wspl lambda (dlugosc geo.) [rad]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+        ns : numer strefy w PL-2000
+            ns = [5,6,7,8]
+            dla pld zerowych:
+            l0 = [15,18,21,24] [°]
+        m0 : wspolczynnik skali odwzorowania PL-2000
+             The default is 0.999923.
+
+        Returns
+        -------
+        x2000: wspl x w PL-2000 [m]
+        y2000: wspl y w PL-2000 [m]
+        xgk: wspl x w G-K [m]
+        ygk: wspl y w G-K [m]
+
+        '''
         if ns == 5:
             l0 = radians(15)
         elif ns == 6:
@@ -511,6 +579,30 @@ class funkcje():
         return(int(ns))
             
     def PL20002fl(self,x20,y20,a,e2,ns,m0 = 0.999923):
+        '''
+        Przelicza wspl w ukl wspl plaskich PL-2000 do wspl elipsoidalnych f,l lub/i wspl w ukl wspl plaskich Gaussa-Krugera x,y
+
+        Parameters
+        ----------
+        x20: wspl x w PL-2000 [m]
+        y20: wspl y w PL-2000 [m]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+        ns : numer strefy w PL-2000
+            ns = [5,6,7,8]
+            dla pld zerowych:
+            l0 = [15,18,21,24] [°]
+        m0 : wspolczynnik skali odwzorowania PL-2000
+             The default is 0.999923.
+
+        Returns
+        -------
+        f : wspl fi (szerokosc geo.) [rad]
+        l : wspl lambda (dlugosc geo.) [rad]
+        xgk: wspl x w G-K [m]
+        ygk: wspl y w G-K [m]
+
+        '''
         if ns == 5:
             l0 = radians(15)
         elif ns == 6:
@@ -624,7 +716,7 @@ class funkcje():
         M = Mp(fm,a,e2) 
         N = Np(fm,a,e2)
         Rm2 = M*N
-        delta = ((xb - xa) * (2 * ya + yb)) / (6 * Rm2)
+        delta = ((xb - xa) * (2 * ya + yb)) / (6 * Rm2) # redukcja kierunku
         # dab = ((xb - xa)*(2*ya + yb))/(6*Rm2)
         # print(dab)
         # dba = ((xa - xb)*(2*yb + ya))/(6 *Rm2)
