@@ -577,7 +577,16 @@ class funkcje():
             raise NotImplementedError('Wyznaczona strefa jest nieprawidlowa dla odwzorowania PL2000.'
                                       'Sprawdz poprawnosc wspolrzednej y2000. Podana wartosc to:'
                                       f'y2000 = {y2000:0.3f}')
-        return(int(ns))
+        if int(ns) == 5:
+            l0 = (np.radians(15))
+        elif int(ns) == 6:
+            l0 = (np.radians(18))
+        elif int(ns) == 7:
+            l0 = (np.radians(21))
+        elif int(ns) == 8:
+            l0 = (np.radians(24))    
+        
+        return(int(ns), l0)
             
     def PL20002fl(self,x20,y20,a,e2,ns,m0 = 0.999923):
         '''
@@ -625,6 +634,11 @@ class funkcje():
         lam = l0 + (ygk/(N1*cos(fi1)))*(1 - (ygk**2/(6*N1**2))*(1 + 2*t**2 + n2) + (ygk**4/(120*N1**4)) * (5 + 28*t**2 + 24*t**4 +6*n2 + 8*n2*t**2))
         return(fi,lam,xgk,ygk)
     
+    def PL20002gk(self, x2000, y2000, ns, m0 = 0.999923):
+        xgk = (x2000/m0)
+        ygk = ((y2000 - 500000 - ns*1000000)/m0)
+        return(xgk, ygk)
+        
     def mgk(self,xgk,ygk,a,e2):
         f = f1(xgk,a,e2)
         R = np.sqrt(Np(f, a, e2) * Mp(f, a, e2))

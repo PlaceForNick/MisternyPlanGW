@@ -293,7 +293,7 @@ class skrypt(funkcje):
             
             while i < len(self.x2000):
                 
-                f,l,xgk,ygk = self.PL20002fl(self.x2000[i], self.y2000[i], self.a, self.e2, self.strefa2(self.y2000[i]))
+                f,l,xgk,ygk = self.PL20002fl(self.x2000[i], self.y2000[i], self.a, self.e2, self.strefa2(self.y2000[i])[0])
                 x1992,y1992,xgk,ygk = self.fl2PL1992(f, l, self.a, self.e2)
                 x_ost.append(x1992); y_ost.append(y1992)
                 i += 1    
@@ -449,21 +449,12 @@ class skrypt(funkcje):
             
             while i < len(self.x2000):
                 #do zmiany/popr
-                ns1 = self.strefa2(self.y2000[i])
-                ns2 = self.strefa2(self.y2000_2[i])
-                self.xgk.append(self.x2000[i]/self.m0_2000)
-                self.ygk.append((self.y2000[i] - 500000 -  ns1*1000000)/self.m0_2000)
-                self.xgk2.append(self.x2000_2[i]/self.m0_2000)
-                self.ygk2.append((self.y2000_2[i] - 500000 - ns2*1000000)/self.m0_2000)
-                if ns1 == ns2:
-                    if ns1 == 5:
-                        l0.append(np.radians(15))
-                    elif ns1 == 6:
-                        l0.append(np.radians(18))
-                    elif ns1 == 7:
-                        l0.append(np.radians(21))
-                    elif ns1 == 8:
-                        l0.append(np.radians(24))   
+                l0.append(''),self.xgk.append(''),self.xgk.append(''),self.xgk2.append(''),self.ygk2.append('')
+                ns, l0[i] = self.strefa2(self.y2000[i])
+                self.xgk[i], self.ygk[i] = (self.PL20002gk(self.x2000[i], self.y2000[i], ns))
+                ns, l0[i] = self.strefa2(self.y2000_2[i])
+                self.xgk2[i], self.ygk2[i] = (self.PL20002gk(self.x2000_2[i], self.y2000_2[i], ns))
+                
                 i += 1
                
         if self.xgk != [] and self.ygk != [] and self.xgk2 != [] and self.ygk2 != []:
@@ -493,15 +484,23 @@ class skrypt(funkcje):
                     A_ab = A_ab + 2*np.pi
                 if A_ba < 0:
                     A_ba = A_ba + 2*np.pi 
-                    
+                    null
                 Aab_st.append(self.dms(A_ab)), Aba_st.append(self.dms(A_ba))
                 Aab_ost.append(np.rad2deg(A_ab)), Aba_ost.append(np.rad2deg(A_ba))
 
                 i += 1
                 
         print(Format.podkresl + f'\nZapytanie {skrypt.ID} [Azymut]:' + Format.normal + '\nAab: ',('{} '*len(Aab_st)).format(*Aab_st),'\nAba: ',('{} '*len(Aba_st)).format(*Aba_st))# '\nA2: ',('{} '*len(A2_st)).format(*A2_st), '\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost), '[m]')
-        return(Aab_ost,Aba_ost)#,A2_ost,s_elip_ost)  
+        return(Aab_ost,Aba_ost)
+    
+    def odl_elip(self):
         
+        s_gk = np.sqrt((self.xgk2[i] - self.xgk[i])**2 + (self.ygk2[i]-self.ygk[i])**2)
+        
+        # red_ab = 
+        
+        s_elip = s_gk - r
+    
 if __name__=='__main__':
       
     # T E S T Y 
