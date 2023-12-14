@@ -10,7 +10,7 @@ class skrypt(funkcje):
     
     ID = 0
     
-    def __init__(self, model='grs80', zapis=False, posrednie=False, nazwa='', X='', Y='', Z='', f='', l='', h='', X2='', Y2='', Z2='', s='', A='', z ='', x2000='', y2000='', x1992='', y1992='', xgk='', ygk='', f2='', l2='', h2='', s_elip=''):
+    def __init__(self, model='grs80', zapis=False, posrednie=False, nazwa='', X='', Y='', Z='', f='', l='', h='', X2='', Y2='', Z2='', s='', A='', z ='', x2000='', y2000='', x1992='', y1992='', xgk='', ygk='', f2='', l2='', h2='', s_elip='', x2000_2='', y2000_2='', x1992_2='', y1992_2='', xgk2='', ygk2=''):
 
         skrypt.ID += 1
         
@@ -22,7 +22,7 @@ class skrypt(funkcje):
         self.m0_2000 = 0.999923
         
         #zamiana podanych danych na liste
-        dane = [X, Y, Z, f, l, h, X2, Y2, Z2, s, A, z, x2000, y2000, x1992, y1992, xgk, ygk, f2, l2, h2, s_elip]
+        dane = [X, Y, Z, f, l, h, X2, Y2, Z2, s, A, z, x2000, y2000, x1992, y1992, xgk, ygk, f2, l2, h2, s_elip, x2000_2, y2000_2, x1992_2, y1992_2, xgk2, ygk2]
         dane_ost = []
         for wartosc in dane:
             if type(wartosc) == list:
@@ -53,6 +53,12 @@ class skrypt(funkcje):
         self.l2 = dane_ost[19]
         self.h2 = dane_ost[20]
         self.s_elip = dane_ost[21]
+        self.x2000_2 = dane_ost[22]
+        self.y2000_2 = dane_ost[23]
+        self.x1992_2 = dane_ost[24]
+        self.y1992_2 = dane_ost[25]
+        self.xgk2 = dane_ost[26]
+        self.ygk2 = dane_ost[27]
         
         #zamiana stopni na radiany           
         dane_kat = [self.f, self.l, self.A, self.z, self.f2, self.l2]
@@ -418,50 +424,86 @@ class skrypt(funkcje):
         return(f2_ost,l2_ost,h2_ost,X2_ost,Y2_ost,Z2_ost)
                
     def Azymut(self):
-        A_ost = []
-        A_st = []
+        Aab_ost = []; Aba_ost = []
+        Aab_st = []; Aba_st = []
+        l0=[]
+        self.xgk=[]
+        self.ygk=[]
+        self.xgk2=[]
+        self.ygk2=[]
         i = 0
         
         if self.x1992 != [''] and self.y1992 != [] and self.x1992_2 != [''] and self.y1992_2 != ['']:
             
-            l0 = np.radians(19)
             while i < len(self.x1992):
                 #do zmiany/popr
-                self.xgk.append((self.x1992 + 5300000)/self.m0_1992)
-                self.ygk.append((self.y1992 - 500000)/self.m0_1992)                
-                self.xgk2.append((self.x1992_2 + 5300000)/self.m0_1992)
-                self.ygk2.append((self.y1992_2 - 500000)/self.m0_1992)
-        
+                self.xgk.append((self.x1992[i] + 5300000)/self.m0_1992)
+                self.ygk.append((self.y1992[i] - 500000)/self.m0_1992)                
+                self.xgk2.append((self.x1992_2[i] + 5300000)/self.m0_1992)
+                self.ygk2.append((self.y1992_2[i] - 500000)/self.m0_1992)
+                l0.append(np.radians(19))
+                i += 1
+                
         elif self.x2000 != [''] and self.y2000 != [] and self.x2000_2 != [''] and self.y2000_2 != ['']:
             
             
             while i < len(self.x2000):
                 #do zmiany/popr
-                self.xgk.append((self.x2000 + 5300000)/self.m0_1992)
-                self.ygk.append((self.y2000 - 500000)/self.m0_1992)
-                self.xgk2.append((self.x2000_2 + 5300000)/self.m0_1992)
-                self.ygk2.append((self.y2000_2 - 500000)/self.m0_1992)
-                
-        if self.xgk != [''] and self.ygk != [''] and self.xgk2 != [''] and self.ygk2 != ['']:
+                ns1 = self.strefa2(self.y2000[i])
+                ns2 = self.strefa2(self.y2000_2[i])
+                self.xgk.append(self.x2000[i]/self.m0_2000)
+                self.ygk.append((self.y2000[i] - 500000 -  ns1*1000000)/self.m0_2000)
+                self.xgk2.append(self.x2000_2[i]/self.m0_2000)
+                self.ygk2.append((self.y2000_2[i] - 500000 - ns2*1000000)/self.m0_2000)
+                if ns1 == ns2:
+                    if ns1 == 5:
+                        l0.append(np.radians(15))
+                    elif ns1 == 6:
+                        l0.append(np.radians(18))
+                    elif ns1 == 7:
+                        l0.append(np.radians(21))
+                    elif ns1 == 8:
+                        l0.append(np.radians(24))   
+                i += 1
+               
+        if self.xgk != [] and self.ygk != [] and self.xgk2 != [] and self.ygk2 != []:
+        # if True:
             
-            while i < len(self.f):
+            i = 0
+            
+            while i < len(self.xgk):
+
                 #krok 2 - policzenie azymutu (kierunku) na plaszczyznie gk:
                 alfa_ab = np.arctan2(self.ygk2[i]-self.ygk[i],self.xgk2[i]-self.xgk[i])
-
+                alfa_ba = np.arctan2(self.ygk[i]-self.ygk2[i],self.xgk[i]-self.xgk2[i])
+                # print(self.dms(alfa_ab),self.dms(alfa_ba))
                 #krok 3 - policzenie zbieznosci pld:
-                gamma_a = self.zbiez_pld(self.xgk[i], self.ygk[i], a, e2)
-                
+                gamma_a = self.zbiez_pld(self.xgk[i], self.ygk[i], self.a, self.e2)
+                gamma_b = self.zbiez_pld(self.xgk2[i], self.ygk2[i], self.a, self.e2)
+                # print(self.dms(gamma_a), self.dms(gamma_b))
                 #krok 4 - policzenie redukcji kierunku:
-                l0 = np.radians(18) #idk co z tym zrobic jak bd podane wspl w gk
-                delta_ab = self.zbiez_kier(self.xgk[i], self.ygk[i], self.xgk2[i], self.ygk2[i], a, e2, l0)
-                
+                # l0 ---> idk co z tym zrobic jak bd podane wspl w gk
+                delta_ab = self.zbiez_kier(self.xgk[i], self.ygk[i], self.xgk2[i], self.ygk2[i], self.a, self.e2, l0[i])
+                delta_ba = self.zbiez_kier(self.xgk2[i], self.ygk2[i], self.xgk[i], self.ygk[i], self.a, self.e2, l0[i])
+                # print(self.dms(delta_ab), self.dms(delta_ba))
                 A_ab = alfa_ab + delta_ab + gamma_a
+                A_ba = alfa_ba + delta_ba + gamma_b
+                
+                if A_ab < 0:
+                    A_ab = A_ab + 2*np.pi
+                if A_ba < 0:
+                    A_ba = A_ba + 2*np.pi 
+                    
+                Aab_st.append(self.dms(A_ab)), Aba_st.append(self.dms(A_ba))
+                Aab_ost.append(np.rad2deg(A_ab)), Aba_ost.append(np.rad2deg(A_ba))
 
                 i += 1
-            
-            
+                
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [Azymut]:' + Format.normal + '\nAab: ',('{} '*len(Aab_st)).format(*Aab_st),'\nAba: ',('{} '*len(Aba_st)).format(*Aba_st))# '\nA2: ',('{} '*len(A2_st)).format(*A2_st), '\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost), '[m]')
+        return(Aab_ost,Aba_ost)#,A2_ost,s_elip_ost)  
+        
 if __name__=='__main__':
-    
+      
     # T E S T Y 
     
     proba1 = skrypt(x1992=100, y1992=7400000)
@@ -484,5 +526,5 @@ if __name__=='__main__':
     
     proba7 = skrypt(x2000 = 5906044.038,y2000 = 6481105.250,x2000_2 = 5895976.242,y2000_2 = 6498384.639)
     proba7.Azymut()
-    
+
     

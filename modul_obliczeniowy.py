@@ -572,7 +572,8 @@ class funkcje():
 
         '''
         ns = str(y2000)[0]
-        if ns != '5' and '6' and '7' and '8':
+        # print(ns)
+        if (ns != '5') and (ns != '6') and (ns != '7') and (ns != '8'):
             raise NotImplementedError('Wyznaczona strefa jest nieprawidlowa dla odwzorowania PL2000.'
                                       'Sprawdz poprawnosc wspolrzednej y2000. Podana wartosc to:'
                                       f'y2000 = {y2000:0.3f}')
