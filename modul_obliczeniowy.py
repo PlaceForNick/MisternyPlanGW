@@ -659,22 +659,18 @@ class funkcje():
 
         Parameters
         ----------
-        xa : TYPE
-            DESCRIPTION.
-        ya : TYPE
-            DESCRIPTION.
-        xb : TYPE
-            DESCRIPTION.
-        yb : TYPE
-            DESCRIPTION.
-        a : TYPE
-            DESCRIPTION.
-        e2 : TYPE
-            DESCRIPTION.
+        xa : wspl x pkt A w G-K [m]
+        ya : wspl y pkt A w G-K [m]
+        xb : wspl x pkt B w G-K [m]
+        yb : wspl y pkt B w G-K [m]
+        l0 : poludnik zerowy [rad]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
 
         Returns
         -------
-        None.
+        r : redukcja odleglosci na plaszczyzne GK [m]
+        sgk : odleglosc na plaszczyznie GK [m]
 
         '''
         sgk = np.sqrt((xa - xb)**2 + (ya - yb)**2)

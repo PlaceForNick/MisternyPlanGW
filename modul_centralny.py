@@ -425,6 +425,26 @@ class skrypt(funkcje):
         return(f2_ost,l2_ost,h2_ost,X2_ost,Y2_ost,Z2_ost)
                
     def Azymut(self):
+        '''
+        Oblicza wartosc azymutu wprost i odwrotnego dla 
+        dostepnych wspolrzednych na plaszczyznie:
+           -PL1992
+           -PL2000
+           -GK, l0
+           
+        Returns
+        -------
+        Aab - azymut wprost [deg]
+        Aba - azymut odwrotny [deg]
+        -------
+        alfa ab - azymut wprost na plaszczyznie GK (azymut topograficzny, kat kierunkowy) [deg]
+        alfa ba - azymut odwrotny na plaszczyznie GK (azymut topograficzny, kat kierunkowy) [deg]
+        gamma a - zbieznosc poludnikow w pkt poczatkowym [deg]
+        gamma b - zbieznosc poludnikow w pkt koncowym [deg]
+        delta ab - redukcja kierunku wprost [deg]
+        delta ba - redukcja kierunku odwrotnego [deg]
+
+        '''
         Aab_ost = []; Aba_ost = []
         Aab_st = []; Aba_st = []
         alfa_ab_st = []; alfa_ba_st = []; gamma_a_st = []; gamma_b_st = []; delta_ab_st = []; delta_ba_st = []
@@ -469,7 +489,6 @@ class skrypt(funkcje):
                 i += 1
                
         if self.xgk != [] and self.ygk != [] and self.xgk2 != [] and self.ygk2 != []:
-        # if True:
             
             i = 0
             
@@ -509,7 +528,22 @@ class skrypt(funkcje):
         return(Aab_ost,Aba_ost)
     
     def OdlElip(self):
+        '''
+        Oblicza odleglosc na elipsoidzie (dlugosc lini geodezyjnej) dla 
+        dostepnych wspolrzednych na plaszczyznie:
+            -PL1992
+            -PL2000
+            -GK, l0
+            
         
+        Returns
+        -------
+        s_elip - dlugosc na elipsoidzie [m]
+        -------
+        s_gk - dlugosc na plszczyznie GK [m]
+        r_gk - redukcja odleglosci na plaszczyzne GK [m]
+
+        '''
         s_elip_ost = []; s_gk_ost=[]; r_gk_ost = []
         l0 =[]
         self.xgk=[]
