@@ -5,7 +5,8 @@ from modul_obliczeniowy import *
 class Format:
     normal = '\033[0m'
     podkresl = '\033[4m'
-        
+    kursywa = '\x1B[3m'
+    
 class skrypt(funkcje):
     
     ID = 0
@@ -426,6 +427,7 @@ class skrypt(funkcje):
     def Azymut(self):
         Aab_ost = []; Aba_ost = []
         Aab_st = []; Aba_st = []
+        alfa_ab_st = []; alfa_ba_st = []; gamma_a_st = []; gamma_b_st = []; delta_ab_st = []; delta_ba_st = []
         l0=[]
         self.xgk=[]
         self.ygk=[]
@@ -476,16 +478,17 @@ class skrypt(funkcje):
                 #krok 2 - policzenie azymutu (kierunku) na plaszczyznie gk:
                 alfa_ab = np.arctan2(self.ygk2[i]-self.ygk[i],self.xgk2[i]-self.xgk[i])
                 alfa_ba = np.arctan2(self.ygk[i]-self.ygk2[i],self.xgk[i]-self.xgk2[i])
-                # print(self.dms(alfa_ab),self.dms(alfa_ba))
+                alfa_ab_st.append(self.dms(alfa_ab)); alfa_ba_st.append(self.dms(alfa_ba))
                 #krok 3 - policzenie zbieznosci pld:
                 gamma_a = self.zbiez_pld(self.xgk[i], self.ygk[i], self.a, self.e2)
                 gamma_b = self.zbiez_pld(self.xgk2[i], self.ygk2[i], self.a, self.e2)
-                # print(self.dms(gamma_a), self.dms(gamma_b))
+                gamma_a_st.append(self.dms(gamma_a)); gamma_b_st.append(self.dms(gamma_b))
                 #krok 4 - policzenie redukcji kierunku:
                 # l0 ---> idk co z tym zrobic jak bd podane wspl w gk
                 delta_ab = self.zbiez_kier(self.xgk[i], self.ygk[i], self.xgk2[i], self.ygk2[i], self.a, self.e2, l0[i])
                 delta_ba = self.zbiez_kier(self.xgk2[i], self.ygk2[i], self.xgk[i], self.ygk[i], self.a, self.e2, l0[i])
-                # print(self.dms(delta_ab), self.dms(delta_ba))
+                delta_ab_st.append(self.dms(delta_ab)); delta_ba_st.append(self.dms(delta_ba))
+                
                 A_ab = alfa_ab + delta_ab + gamma_a
                 A_ba = alfa_ba + delta_ba + gamma_b
                 
@@ -498,9 +501,77 @@ class skrypt(funkcje):
                 Aab_ost.append(np.rad2deg(A_ab)), Aba_ost.append(np.rad2deg(A_ba))
 
                 i += 1
+        
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [OdlElip]:' + Format.normal)     
+        if self.posrednie == True:
+            print(Format.kursywa + 'Wyniki posrednie:' + Format.normal + '\n\u03B1ab: ',('{} '*len(alfa_ab_st)).format(*alfa_ab_st) + '\n\u03B1ba: ',('{} '*len(alfa_ba_st)).format(*alfa_ba_st) + '\n\u03B3a: ',('{} '*len(gamma_a_st)).format(*gamma_a_st)  + '\n\u03B3b: ',('{} '*len(gamma_b_st)).format(*gamma_b_st) + '\n\u03B4ab: ',('{} '*len(delta_ab_st)).format(*delta_ab_st) + '\n\u03B4ba: ',('{} '*len(delta_ba_st)).format(*delta_ba_st) + Format.kursywa + '\nWyniki ostateczne:' + Format.normal)
+        print('Aab: ',('{} '*len(Aab_st)).format(*Aab_st),'\nAba: ',('{} '*len(Aba_st)).format(*Aba_st))
+        return(Aab_ost,Aba_ost)
+    
+    def OdlElip(self):
+        
+        s_elip_ost = []; s_gk_ost=[]; r_gk_ost = []
+        l0 =[]
+        self.xgk=[]
+        self.ygk=[]
+        self.xgk2=[]
+        self.ygk2=[]
+        i = 0
+        
+        if self.x1992 != [''] and self.y1992 != [] and self.x1992_2 != [''] and self.y1992_2 != ['']:
+            
+            while i < len(self.x1992):
+                #do zmiany/popr
+                self.xgk.append((self.x1992[i] + 5300000)/self.m0_1992)
+                self.ygk.append((self.y1992[i] - 500000)/self.m0_1992)                
+                self.xgk2.append((self.x1992_2[i] + 5300000)/self.m0_1992)
+                self.ygk2.append((self.y1992_2[i] - 500000)/self.m0_1992)
+                l0.append(np.radians(19))
+                i += 1
                 
-        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [Azymut]:' + Format.normal + '\nAab: ',('{} '*len(Aab_st)).format(*Aab_st),'\nAba: ',('{} '*len(Aba_st)).format(*Aba_st))# '\nA2: ',('{} '*len(A2_st)).format(*A2_st), '\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost), '[m]')
-        return(Aab_ost,Aba_ost)#,A2_ost,s_elip_ost)  
+        elif self.x2000 != [''] and self.y2000 != [] and self.x2000_2 != [''] and self.y2000_2 != ['']:
+            
+            
+            while i < len(self.x2000):
+                #do zmiany/popr
+                ns1 = self.strefa2(self.y2000[i])
+                ns2 = self.strefa2(self.y2000_2[i])
+                self.xgk.append(self.x2000[i]/self.m0_2000)
+                self.ygk.append((self.y2000[i] - 500000 -  ns1*1000000)/self.m0_2000)
+                self.xgk2.append(self.x2000_2[i]/self.m0_2000)
+                self.ygk2.append((self.y2000_2[i] - 500000 - ns2*1000000)/self.m0_2000)
+                if ns1 == ns2:
+                    if ns1 == 5:
+                        l0.append(np.radians(15))
+                    elif ns1 == 6:
+                        l0.append(np.radians(18))
+                    elif ns1 == 7:
+                        l0.append(np.radians(21))
+                    elif ns1 == 8:
+                        l0.append(np.radians(24))   
+                i += 1
+        if self.xgk != [] and self.ygk != [] and self.xgk2 != [] and self.ygk2 != []:  
+            
+            i = 0
+            
+            while i < len(self.xgk):
+                #krok 1: s_gk
+                # s_gk = np.sqrt((self.xgk2[i] - self.xgk[i])**2 + (self.ygk2[i] - self.ygk[i])**2)
+                #krok 2: r_ab
+                r, s_gk = self.red_gk(self.xgk[i], self.ygk[i], self.xgk2[i], self.ygk2[i], l0[i], self.a, self.e2)
+                #krok 3: s_elip
+                s_elip = s_gk - r
+                s_elip_ost.append(s_elip); s_gk_ost.append(s_gk); r_gk_ost.append(r)
+                
+                i += 1
+                
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [OdlElip]:' + Format.normal)     
+        if self.posrednie == True:
+            print(Format.kursywa + 'Wyniki posrednie:' + Format.normal + '\ns_gk: ',('{:.3f} '*len(s_gk_ost)).format(*s_gk_ost) + '[m]\nr_gk: ',('{:.3f} '*len(r_gk_ost)).format(*r_gk_ost) + '[m]' + Format.kursywa + '\nWyniki ostateczne:' + Format.normal)
+        print('s_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost) + '[m]')
+        return(s_elip_ost)
+
+        
         
 if __name__=='__main__':
       

@@ -631,27 +631,59 @@ class funkcje():
         m = 1 + ygk**2 / (2 * R**2) + ygk**4 / (24 * R**4)
         return(m)
     
-    def red_gk(self,xa,ya,xb,yb,ns,a,e2):
+    # def red_gk(self,xa,ya,xb,yb,ns,a,e2):
+    #     xm = (xa + xb)/2
+    #     ym = (ya + yb)/2
+    #     if ns == 'GK':
+    #         l0 = 0
+    #         fm,lm = GK2fl(xm, ym, a, e2, l0)
+    #     elif ns =='1992':
+    #         fm, lm, xm, ym = PL19922fl(xm, ym, a, e2)
+    #         fa, la, xa, ya = PL19922fl(xa, ya, a, e2)
+    #         fb, lb, xb, yb = PL19922fl(xb, yb, a, e2)
+    #     elif (ns == 5) or (ns == 6) or (ns == 7) or (ns == 8):
+    #         fm, lm, xm, ym = PL20002fl(xm, ym, a, e2, ns)
+    #         fa, la, xa, ya = PL20002fl(xa, ya, a, e2, ns)
+    #         fb, lb, xb, yb = PL20002fl(xb, yb, a, e2, ns)
+    #     else:
+    #         fm,lm = GK2fl(xm, ym, a, e2, ns)
+    #     Rm2 = Mp(fm,a,e2)*Np(fm,a,e2)
+    #     sgk = np.sqrt((xa - xb)**2 + (ya - yb)**2)
+    #     r = sgk *(ya**2 + ya*yb + yb**2)/(6 * Rm2)
+    #     selip = sgk - r 
+    #     return(r,selip,sgk)
+    
+    def red_gk(self,xa,ya,xb,yb,l0,a,e2):
+        '''
+        liczy redukcje odleglosci GK dla podanych wspl
+
+        Parameters
+        ----------
+        xa : TYPE
+            DESCRIPTION.
+        ya : TYPE
+            DESCRIPTION.
+        xb : TYPE
+            DESCRIPTION.
+        yb : TYPE
+            DESCRIPTION.
+        a : TYPE
+            DESCRIPTION.
+        e2 : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        '''
+        sgk = np.sqrt((xa - xb)**2 + (ya - yb)**2)
         xm = (xa + xb)/2
         ym = (ya + yb)/2
-        if ns == 'GK':
-            l0 = 0
-            fm,lm = GK2fl(xm, ym, a, e2, l0)
-        elif ns =='1992':
-            fm, lm, xm, ym = PL19922fl(xm, ym, a, e2)
-            fa, la, xa, ya = PL19922fl(xa, ya, a, e2)
-            fb, lb, xb, yb = PL19922fl(xb, yb, a, e2)
-        elif (ns == 5) or (ns == 6) or (ns == 7) or (ns == 8):
-            fm, lm, xm, ym = PL20002fl(xm, ym, a, e2, ns)
-            fa, la, xa, ya = PL20002fl(xa, ya, a, e2, ns)
-            fb, lb, xb, yb = PL20002fl(xb, yb, a, e2, ns)
-        else:
-            fm,lm = GK2fl(xm, ym, a, e2, ns)
-        Rm2 = Mp(fm,a,e2)*Np(fm,a,e2)
-        sgk = np.sqrt((xa - xb)**2 + (ya - yb)**2)
+        fm,lm = self.GK2fl(xm, ym, a, e2, l0)
+        Rm2 = self.Mp(fm,a,e2)*self.Np(fm,a,e2)
         r = sgk *(ya**2 + ya*yb + yb**2)/(6 * Rm2)
-        selip = sgk - r 
-        return(r,selip,sgk)
+        return(r,sgk)
     
     def redu_d(self,xa, xb, ya, yb, ha, hb, spom, l0, a, e2):
         xm = (xa + xb) / 2
