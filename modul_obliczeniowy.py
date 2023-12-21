@@ -684,12 +684,12 @@ class funkcje():
     def redu_d(self,xa, xb, ya, yb, ha, hb, spom, l0, a, e2):
         xm = (xa + xb) / 2
         ym = (ya + yb) /2
-        fm, lm = GK2fl(xm,ym,a,e2,l0)
-        Rm = sqrt((Np(fm,a,e2))*(Mp(fm,a,e2)))
+        fm, lm = self.GK2fl(xm,ym,a,e2,l0)
+        Rm = sqrt((self.Np(fm,a,e2))*(self.Mp(fm,a,e2)))
         dh = hb-ha
         s0 = sqrt((spom**2 - dh**2)/((1+(ha/Rm))*(1+(hb/Rm))))
         selip = 2 * Rm * asin(s0/(2*Rm))
-        return selip
+        return(s0, selip)
     
     def red_odl_skosnej(self,x,y,h,s,z,beta,i,l,a,e2):
         Xp = x + s*np.sin(z) *np.cos(beta)
