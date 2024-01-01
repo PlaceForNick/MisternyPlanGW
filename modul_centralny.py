@@ -625,49 +625,91 @@ class skrypt(funkcje):
         return(s_elip_ost)
 
     def OdlPL2000(self):
+        '''
+        Oblicza odleglosc w układzie PL-2000 dla 
+        dostepnych danych:
+            -PL2000
+            -XYZ, XYZ2
+            -fl, fl2
+
+        Returns
+        -------
+        s_2000 - dlugosc w ukladzie PL2000 [m]
+        -------
+        s_XYZ - dlugosc w ukladzie wspl prostokatnych [m]
+        s_0 - dlugosc skosna [m]
+        s_elip - dlugosc na elipsoidzie [m]
+        s_gk - dlugosc na plszczyznie GK [m]
+        r_gk - redukcja odleglosci na plaszczyzne GK [m]
+        
+        '''
         l0 = []
         s_2000_ost = []; s_elip_ost = []; s_0_ost = []; s_gk_ost = []; r_gk_ost = []; s_XYZ_ost = []
         i = 0
         
         if self.x2000 != [''] and self.y2000 != [''] and self.x2000_2 != [''] and self.y2000_2 != ['']:
-            
+
             while i < len(self.x2000):
                 
                 s_2000 = np.sqrt((self.x2000_2[i] - self.x2000[i])**2 + (self.y2000_2[i] - self.y2000[i])**2)
                 s_2000_ost.append(s_2000)
                 i += 1
-                
-        elif self.X != [''] and self.Y != [''] and self.Z != [''] and self.X2 != [''] and self.Y2 != [''] and self.Z2 != ['']:
-
-            while i < len(self.X):
-                
-                f,l,h = self.xyz2flh(self.X[i], self.Y[i], self.Z[i], self.a, self.e2)
-                ns = self.strefa(l)
-                x2000,y2000,xgk,ygk = self.fl2PL2000(f, l, self.a, self.e2, ns)
-                
-                f2,l2,h2 = self.xyz2flh(self.X2[i], self.Y2[i], self.Z2[i], self.a, self.e2)
-                ns2 = self.strefa(l2)
-                x2000_2,y2000_2,xgk_2,ygk_2 = self.fl2PL2000(f2, l2, self.a, self.e2, ns2)
-                
-                if ns == ns2:
-                    if ns == 5:
-                        l0.append(np.radians(15))
-                    elif ns == 6:
-                        l0.append(np.radians(18))
-                    elif ns == 7:
-                        l0.append(np.radians(21))
-                    elif ns == 8:
-                        l0.append(np.radians(24)) 
-                
-                s_XYZ = np.sqrt((self.X2[i]-self.X[i])**2 + (self.Y2[i]-self.Y[i])**2 + (self.Z2[i]-self.Z[i])**2)
-                s_0, s_elip = self.redu_d(xgk, xgk_2, ygk, ygk_2, h, h2, s_XYZ, l0[i], self.a, self.e2) 
-                r_gk, s_gk = self.red_gk(xgk, ygk, xgk_2, ygk_2, l0[i], self.a, self.e2)
-                s_gk = s_elip + r_gk
-                s_2000 = 0.999923*s_gk
-                
-                s_2000_ost.append(s_2000); s_elip_ost.append(s_elip); s_0_ost.append(s_0); s_gk_ost.append(s_gk); r_gk_ost.append(r_gk); s_XYZ_ost.append(s_XYZ)
-                i += 1
+        
+        else:
             
+            if self.X != [''] and self.Y != [''] and self.Z != [''] and self.X2 != [''] and self.Y2 != [''] and self.Z2 != ['']:
+                
+                self.f = []
+                self.l = []
+                self.h = []
+                self.f2 = []
+                self.l2 = []
+                self.h2 = []
+                i = 0
+                
+                while i < len(self.X):
+                    
+                    f,l,h = self.xyz2flh(self.X[i], self.Y[i], self.Z[i], self.a, self.e2)
+                    self.f.append(f)
+                    self.l.append(l)
+                    self.h.append(h)
+                    f2,l2,h2 = self.xyz2flh(self.X2[i], self.Y2[i], self.Z2[i], self.a, self.e2)
+                    self.f2.append(f2)
+                    self.l2.append(l2)
+                    self.h2.append(h2)
+                    
+                    i += 1
+                    
+            if self.f != [''] and self.l != [''] and self.f2 != [''] and self.l2 != ['']:
+                
+                    i = 0  
+                    
+                    while i < len(self.f):     
+                       
+                        ns = self.strefa(self.l[i])
+                        x2000,y2000,xgk,ygk = self.fl2PL2000(self.f[i], self.l[i], self.a, self.e2, ns)
+                        ns2 = self.strefa(self.l2[i])
+                        x2000_2,y2000_2,xgk_2,ygk_2 = self.fl2PL2000(self.f2[i], self.l2[i], self.a, self.e2, ns2)
+                        
+                        if ns == ns2:
+                            if ns == 5:
+                                l0.append(np.radians(15))
+                            elif ns == 6:
+                                l0.append(np.radians(18))
+                            elif ns == 7:
+                                l0.append(np.radians(21))
+                            elif ns == 8:
+                                l0.append(np.radians(24)) 
+                        
+                        s_XYZ = np.sqrt((self.X2[i]-self.X[i])**2 + (self.Y2[i]-self.Y[i])**2 + (self.Z2[i]-self.Z[i])**2)
+                        s_0, s_elip = self.redu_d(xgk, xgk_2, ygk, ygk_2, h, h2, s_XYZ, l0[i], self.a, self.e2) 
+                        r_gk, s_gk = self.red_gk(xgk, ygk, xgk_2, ygk_2, l0[i], self.a, self.e2)
+                        s_gk = s_elip + r_gk
+                        s_2000 = 0.999923*s_gk
+                        
+                        s_2000_ost.append(s_2000); s_elip_ost.append(s_elip); s_0_ost.append(s_0); s_gk_ost.append(s_gk); r_gk_ost.append(r_gk); s_XYZ_ost.append(s_XYZ)
+                        i += 1
+                
         print(Format.podkresl + f'\nZapytanie {skrypt.ID} [OdlPL2000]:' + Format.normal)     
         if self.posrednie == True:
             print(Format.kursywa + 'Wyniki posrednie:' + Format.normal + '\ns_XYZ: ',('{:.3f} '*len(s_XYZ_ost)).format(*s_XYZ_ost) + '[m]\ns_0: ',('{:.3f} '*len(s_0_ost)).format(*s_0_ost) + '[m]\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost) + '[m]\ns_gk: ',('{:.3f} '*len(s_gk_ost)).format(*s_gk_ost) + '[m]\nr_gk: ',('{:.3f} '*len(r_gk_ost)).format(*r_gk_ost) + '[m]' + Format.kursywa + '\nWyniki ostateczne:' + Format.normal)
