@@ -652,11 +652,50 @@ class skrypt(funkcje):
     def OdlNEU(self):
         pass
     
-    def ZnieksztalcenieOdl(self):
-        pass
-    
-    def ZnieksztalceniePola(self):
-        pass
+    def Znieksztalcenia(self):
+        znie_odl_ost = []; znie_pol_ost = []
+        
+        if self.x2000 != [''] and self.y2000 != ['']:
+            
+            i = 0
+            
+            while i < len(self.x2000): 
+                
+                ns = self.strefa2(self.y2000[i])
+                f,l,xgk,ygk = self.PL20002fl(self.x2000[i], self.y2000[i], self.a, self.e2, ns)
+                R = np.sqrt(self.Np(f, self.a, self.e2)*self.Mp(f, self.a, self.e2))
+                mgk = 1 + ygk**2/2/R**2 + ygk**4/24/R**4
+                m2000 = self.m0_2000 * mgk
+                znie_odl = 1000 * m2000 - 1000
+                znie_pol = 10000 * m2000**2 - 10000
+                znie_odl_ost.append(znie_odl)
+                znie_pol_ost.append(znie_pol)
+                i += 1
+                
+        elif self.x1992 != [''] and self.y1992 != ['']:
+             
+             i = 0
+             
+             while i < len(self.x1992): 
+                 
+                 f,l,xgk,ygk = self.PL19922fl(self.x1992[i], self.y1992[i], self.a, self.e2)
+                 R = np.sqrt(self.Np(f, self.a, self.e2)*self.Mp(f, self.a, self.e2))
+                 mgk = 1 + ygk**2/2/R**2 + ygk**4/24/R**4
+                 m1992 = self.m0_1992 * mgk
+                 znie_odl = 1000 * m1992 - 1000
+                 znie_pol = 10000 * m1992**2 - 10000
+                 znie_odl_ost.append(znie_odl)
+                 znie_pol_ost.append(znie_pol)
+                 i += 1     
+                 
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [Znieksztalcenia]:' + Format.normal)     
+        if self.posrednie == True:
+            pass
+            #print(Format.kursywa + 'Wyniki posrednie:' + Format.normal + '\ns_XYZ: ',('{:.3f} '*len(s_XYZ_ost)).format(*s_XYZ_ost) + '[m]\ns_0: ',('{:.3f} '*len(s_0_ost)).format(*s_0_ost) + '[m]\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost) + '[m]\ns_gk: ',('{:.3f} '*len(s_gk_ost)).format(*s_gk_ost) + '[m]\nr_gk: ',('{:.3f} '*len(r_gk_ost)).format(*r_gk_ost) + '[m]' + Format.kursywa + '\nWyniki ostateczne:' + Format.normal)
+        print('znieksztalcenie odleglosci: ',('{:.3f} '*len(znie_odl_ost)).format(*znie_odl_ost) + '[m/km]\nznieksztalcenie pola: ',('{:.3f} '*len(znie_pol_ost)).format(*znie_pol_ost) + '[m2/ha]')
+        return(znie_odl_ost,znie_pol_ost)
+
+
         
 if __name__=='__main__':
       
