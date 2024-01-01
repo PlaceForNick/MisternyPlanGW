@@ -345,9 +345,28 @@ class skrypt(funkcje):
         A_st = []; A2_st = []
         A_ost = []; A2_ost = []
         s_elip_ost = []
-        i = 0
         
+        if self.X != [''] and self.Y != [''] and self.Z != [''] and self.X2 != [''] and self.Y2 != [''] and self.Z2 != ['']:
+            
+            i = 0
+            self.f = []; self.l = []; self.h = []
+            self.f2 = []; self.l2 = []; self.h2 = []
+            
+            while i < len(self.X):
+                
+                f,l,h = self.xyz2flh(self.X[i], self.Y[i], self.Z[i], self.a, self.e2)
+                f2,l2,h2 = self.xyz2flh(self.X2[i], self.Y2[i], self.Z2[i], self.a, self.e2)
+                self.f.append(f)
+                self.l.append(l)
+                self.h.append(h)
+                self.f2.append(f2)
+                self.l2.append(l2)
+                self.h2.append(h2)
+                i += 1
+                
         if self.f != [''] and self.l != [''] and self.f2 != [''] and self.l2 != ['']:
+            
+            i = 0
             
             while i < len(self.f):
                 
