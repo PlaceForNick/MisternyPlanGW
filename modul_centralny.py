@@ -765,7 +765,7 @@ class skrypt(funkcje):
         if self.posrednie == True:
             pass
             #print(Format.kursywa + 'Wyniki posrednie:' + Format.normal + '\ns_XYZ: ',('{:.3f} '*len(s_XYZ_ost)).format(*s_XYZ_ost) + '[m]\ns_0: ',('{:.3f} '*len(s_0_ost)).format(*s_0_ost) + '[m]\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost) + '[m]\ns_gk: ',('{:.3f} '*len(s_gk_ost)).format(*s_gk_ost) + '[m]\nr_gk: ',('{:.3f} '*len(r_gk_ost)).format(*r_gk_ost) + '[m]' + Format.kursywa + '\nWyniki ostateczne:' + Format.normal)
-        print('znieksztalcenie odleglosci: ',('{:.3f} '*len(znie_odl_ost)).format(*znie_odl_ost) + '[m/km]\nznieksztalcenie pola: ',('{:.3f} '*len(znie_pol_ost)).format(*znie_pol_ost) + '[m2/ha]')
+        print('znieksztalcenie odleglosci: ',('{:.3f} '*len(znie_odl_ost)).format(*znie_odl_ost) + '[cm/km]\nznieksztalcenie pola: ',('{:.3f} '*len(znie_pol_ost)).format(*znie_pol_ost) + '[m2/ha]')
         return(znie_odl_ost,znie_pol_ost)
 
 
