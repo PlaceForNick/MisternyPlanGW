@@ -11,7 +11,7 @@ class skrypt(funkcje):
     
     ID = 0
     
-    def __init__(self, model='grs80', zapis=False, posrednie=False, nazwa='', X='', Y='', Z='', f='', l='', h='', X2='', Y2='', Z2='', s='', A='', z ='', x2000='', y2000='', x1992='', y1992='', xgk='', ygk='', f2='', l2='', h2='', s_elip='', x2000_2='', y2000_2='', x1992_2='', y1992_2='', xgk2='', ygk2='', s_0='', s_1992='', s_2000=''):
+    def __init__(self, model='grs80', zapis=False, posrednie=False, nazwa='', X='', Y='', Z='', f='', l='', h='', X2='', Y2='', Z2='', s='', A='', z ='', x2000='', y2000='', x1992='', y1992='', xgk='', ygk='', f2='', l2='', h2='', s_elip='', x2000_2='', y2000_2='', x1992_2='', y1992_2='', xgk2='', ygk2='', s_0='', s_1992='', s_2000='', p=''):
 
         skrypt.ID += 1
         
@@ -23,10 +23,13 @@ class skrypt(funkcje):
         self.m0_2000 = 0.999923
         
         #zamiana podanych danych na liste
-        dane = [X, Y, Z, f, l, h, X2, Y2, Z2, s, A, z, x2000, y2000, x1992, y1992, xgk, ygk, f2, l2, h2, s_elip, x2000_2, y2000_2, x1992_2, y1992_2, xgk2, ygk2]
+        dane = [X, Y, Z, f, l, h, X2, Y2, Z2, s, A, z, x2000, y2000, x1992, y1992, xgk, ygk, f2, l2, h2, s_elip, x2000_2, y2000_2, x1992_2, y1992_2, xgk2, ygk2, s_0, s_1992, s_2000, p]
         dane_ost = []
         for wartosc in dane:
-            if type(wartosc) == list:
+            if wartosc == p and p!= '':
+                wartosc_lista = []
+                wartosc_lista.append(wartosc)
+            elif type(wartosc) == list:
                 wartosc_lista = wartosc
             else:
                 wartosc_lista = []
@@ -60,9 +63,12 @@ class skrypt(funkcje):
         self.y1992_2 = dane_ost[25]
         self.xgk2 = dane_ost[26]
         self.ygk2 = dane_ost[27]
+        self.s_0 = dane_ost[28]
+        self.s_1992 = dane_ost[29]
+        self.s_2000 = dane_ost[30]
+        self.p = dane_ost[31]
         
-        #zamiana stopni na radiany           
-        dane_kat = [self.f, self.l, self.A, self.z, self.f2, self.l2]
+        dane_kat = [self.f, self.l, self.A, self.z, self.f2, self.l2, self.p]
         dane_kat_ost = []
         for wartosc_lista in dane_kat:
             wartosc_ost = []
@@ -70,9 +76,22 @@ class skrypt(funkcje):
             while True:
                 try:
                     wartosc = wartosc_lista[i]
-                    if type(wartosc) == list:
+                    if type(wartosc) == list and len(wartosc) == 0:
                         wartosc = wartosc[0]
-                    if wartosc =='':
+                    if type(wartosc) == list:
+                        if len(wartosc) == 9:
+                            dane_kat.append([wartosc[3]])
+                            dane_kat.append([wartosc[4]])
+                            dane_kat.append([wartosc[5]])
+                        elif len(wartosc) == 7:
+                            dane_kat.append([wartosc[1]])
+                            dane_kat.append([wartosc[2]])
+                            dane_kat.append([wartosc[3]])
+                        elif len(wartosc) == 6:
+                            dane_kat.append([wartosc[0]])
+                            dane_kat.append([wartosc[1]])
+                            dane_kat.append([wartosc[2]])
+                    elif wartosc =='':
                         wartosc = wartosc
                     elif type(wartosc) == str:
                         wartosc = self.fromdms(wartosc)[0]
@@ -89,8 +108,18 @@ class skrypt(funkcje):
         self.z = dane_kat_ost[3]
         self.f2 = dane_kat_ost[4]
         self.l2 = dane_kat_ost[5]
-
-    
+        
+        p_nowe = []
+        for parametry in self.p:
+            if len(parametry) == 9:
+                parametry[3:6] = dane_kat_ost[7][0], dane_kat_ost[8][0], dane_kat_ost[9][0]
+            elif len(parametry) == 7:
+                parametry[1:4] = dane_kat_ost[7][0], dane_kat_ost[8][0], dane_kat_ost[9][0]
+            elif len(parametry) == 6:
+                parametry[0:3] = dane_kat_ost[7][0], dane_kat_ost[8][0], dane_kat_ost[9][0]
+            p_nowe.append(parametry)
+        self.p = p_nowe
+        
     def __elipsoida(self, model):
         #wybor elipsoidy
         if    model  == 'kra':
@@ -768,8 +797,55 @@ class skrypt(funkcje):
         print('znieksztalcenie odleglosci: ',('{:.3f} '*len(znie_odl_ost)).format(*znie_odl_ost) + '[cm/km]\nznieksztalcenie pola: ',('{:.3f} '*len(znie_pol_ost)).format(*znie_pol_ost) + '[m2/ha]')
         return(znie_odl_ost,znie_pol_ost)
 
+    def Transformacja(self):
+        '''
+        Wykonuje transformacje współrzędnych pierwotnych XYZ do układu wtótnego XYZ2 
+        na podstawie dostępnych danych. Model transformacji wybierany jest 
+        na podstawie ilości dostarczonych parametrów transformacji p:
+            -XYZ, p = [kappa x, kappa y, kappa z, alfa, beta, gamma, dx, dy, dz] 
+                -> transformacja kwaziafiniczna 
+            -XYZ, p = [kappa, alfa, beta, gamma, dx, dy, dz] 
+                -> transformacja Bursa-Wolfa
+            -XYZ, p = [alfa, beta, gamma, dx, dy, dz]
+                -> transformacja izometryczna
 
+        Returns
+        -------
+            -XYZ2 - wspl prostokatne w ukladzie wtornym [m]
+
+        '''
         
+        X2_ost = []; Y2_ost = []; Z2_ost = []
+        i = 0
+        
+        if self.X != [''] and self.Y != [''] and self.Z != ['']:
+            
+            while i < len(self.X):
+
+                if len(self.p[i]) == 9:
+
+                    X2, Y2, Z2 = self.kwazi([self.X[i], self.Y[i], self.Z[i]], self.p[i])
+                    X2_ost.append(X2), Y2_ost.append(Y2), Z2_ost.append(Z2)
+                    
+                if len(self.p[i]) == 7:
+                    
+                    X2, Y2, Z2 = self.bursa([self.X[i], self.Y[i], self.Z[i]], self.p[i])
+                    X2_ost.append(X2), Y2_ost.append(Y2), Z2_ost.append(Z2)
+                    
+                if len(self.p[i]) == 6:
+                    
+                    X2, Y2, Z2 = self.izometr([self.X[i], self.Y[i], self.Z[i]], self.p[i])
+                    X2_ost.append(X2), Y2_ost.append(Y2), Z2_ost.append(Z2)
+                
+                i += 1
+                
+        print(Format.podkresl + f'\nZapytanie {skrypt.ID} [Transformacje]:' + Format.normal)     
+        if self.posrednie == True:
+            pass
+            #print(Format.kursywa + 'Wyniki posrednie:' + Format.normal + '\ns_XYZ: ',('{:.3f} '*len(s_XYZ_ost)).format(*s_XYZ_ost) + '[m]\ns_0: ',('{:.3f} '*len(s_0_ost)).format(*s_0_ost) + '[m]\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost) + '[m]\ns_gk: ',('{:.3f} '*len(s_gk_ost)).format(*s_gk_ost) + '[m]\nr_gk: ',('{:.3f} '*len(r_gk_ost)).format(*r_gk_ost) + '[m]' + Format.kursywa + '\nWyniki ostateczne:' + Format.normal)                        
+        print('X2: ',('{:.3f} '*len(X2_ost)).format(*X2_ost), '[m]\nY2: ',('{:.3f} '*len(Y2_ost)).format(*Y2_ost), '[m]\nZ2: ',('{:.3f} '*len(Z2_ost)).format(*Z2_ost), '[m]')
+        # return(znie_odl_ost,znie_pol_ost) 
+      
 if __name__=='__main__':
       
     # T E S T Y 
@@ -794,5 +870,11 @@ if __name__=='__main__':
     
     proba7 = skrypt(x2000 = 5906044.038,y2000 = 6481105.250,x2000_2 = 5895976.242,y2000_2 = 6498384.639)
     proba7.Azymut()
+    
+    proba8 = skrypt(p=[0.000002, 0.000001, -0.000002, '-0 0 2', '0 0 0.5', '0 0 1', 100, 200, -300],
+                    X=5500000, 
+                    Y=4350000,
+                    Z=3125000)
+    proba8.Transformacja()
 
     
