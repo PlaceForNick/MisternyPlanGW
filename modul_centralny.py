@@ -76,7 +76,7 @@ class skrypt(funkcje):
             while True:
                 try:
                     wartosc = wartosc_lista[i]
-                    if type(wartosc) == list and len(wartosc) == 0:
+                    if type(wartosc) == list and len(wartosc) == 1:
                         wartosc = wartosc[0]
                     if type(wartosc) == list:
                         if len(wartosc) == 9:
@@ -258,7 +258,8 @@ class skrypt(funkcje):
         i = 0
         
         if self.f != [''] and self.l != ['']:
-            
+            print(self.f)
+            print(self.l)
             while i < len(self.f):
                 
                 x2000,y2000,xgk,ygk = self.fl2PL2000(self.f[i], self.l[i], self.a, self.e2, self.strefa(self.l[i]))
@@ -755,8 +756,24 @@ class skrypt(funkcje):
         pass
     
     def Znieksztalcenia(self):
+        '''
+        Oblicza znieksztalcenia pola powierzchni i odleglosci dla wspl w podanym
+        ukl wspl plaskich:
+            -PL2000
+            -PL1992
+
+        Returns
+        -------
+        znie_odl - znieksztalcenie odlegosci [cm/km]
+        znie_pol - znieksztalcenie pola powierzchni [m2/ha]
+        -------
+        mgk - skala ukl GK [-]
+        m2000 - skala ukl PL2000 [-]
+        m1992 - skala ukl PL1992 [-]
+
+        '''
         znie_odl_ost = []; znie_pol_ost = []
-        
+        mgk_ost = []; m2000_ost = []; m1992_ost =[]
         if self.x2000 != [''] and self.y2000 != ['']:
             
             i = 0
@@ -770,8 +787,8 @@ class skrypt(funkcje):
                 m2000 = self.m0_2000 * mgk
                 znie_odl = 1000 * m2000 - 1000
                 znie_pol = 10000 * m2000**2 - 10000
-                znie_odl_ost.append(znie_odl)
-                znie_pol_ost.append(znie_pol)
+                znie_odl_ost.append(znie_odl); znie_pol_ost.append(znie_pol)
+                mgk_ost.append(mgk); m2000_ost.append(m2000)
                 i += 1
                 
         elif self.x1992 != [''] and self.y1992 != ['']:
@@ -786,14 +803,13 @@ class skrypt(funkcje):
                  m1992 = self.m0_1992 * mgk
                  znie_odl = 1000 * m1992 - 1000
                  znie_pol = 10000 * m1992**2 - 10000
-                 znie_odl_ost.append(znie_odl)
-                 znie_pol_ost.append(znie_pol)
+                 znie_odl_ost.append(znie_odl); znie_pol_ost.append(znie_pol)
+                 mgk_ost.append(mgk), m1992_ost.append(m1992)
                  i += 1     
                  
         print(Format.podkresl + f'\nZapytanie {skrypt.ID} [Znieksztalcenia]:' + Format.normal)     
         if self.posrednie == True:
-            pass
-            #print(Format.kursywa + 'Wyniki posrednie:' + Format.normal + '\ns_XYZ: ',('{:.3f} '*len(s_XYZ_ost)).format(*s_XYZ_ost) + '[m]\ns_0: ',('{:.3f} '*len(s_0_ost)).format(*s_0_ost) + '[m]\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost) + '[m]\ns_gk: ',('{:.3f} '*len(s_gk_ost)).format(*s_gk_ost) + '[m]\nr_gk: ',('{:.3f} '*len(r_gk_ost)).format(*r_gk_ost) + '[m]' + Format.kursywa + '\nWyniki ostateczne:' + Format.normal)
+            print(Format.kursywa + 'Wyniki posrednie:' + Format.normal + '\nmgk: ',('{:.5f} '*len(mgk_ost)).format(*mgk_ost) + '[-]\nm2000: ',('{:.3f} '*len(m2000_ost)).format(*m2000_ost) + '[-]\nm1992: ',('{:.3f} '*len(m1992_ost)).format(*m1992_ost) + '[-]' + Format.kursywa + '\nWyniki ostateczne:' + Format.normal)
         print('znieksztalcenie odleglosci: ',('{:.3f} '*len(znie_odl_ost)).format(*znie_odl_ost) + '[cm/km]\nznieksztalcenie pola: ',('{:.3f} '*len(znie_pol_ost)).format(*znie_pol_ost) + '[m2/ha]')
         return(znie_odl_ost,znie_pol_ost)
 
@@ -844,7 +860,7 @@ class skrypt(funkcje):
             pass
             #print(Format.kursywa + 'Wyniki posrednie:' + Format.normal + '\ns_XYZ: ',('{:.3f} '*len(s_XYZ_ost)).format(*s_XYZ_ost) + '[m]\ns_0: ',('{:.3f} '*len(s_0_ost)).format(*s_0_ost) + '[m]\ns_elip: ',('{:.3f} '*len(s_elip_ost)).format(*s_elip_ost) + '[m]\ns_gk: ',('{:.3f} '*len(s_gk_ost)).format(*s_gk_ost) + '[m]\nr_gk: ',('{:.3f} '*len(r_gk_ost)).format(*r_gk_ost) + '[m]' + Format.kursywa + '\nWyniki ostateczne:' + Format.normal)                        
         print('X2: ',('{:.3f} '*len(X2_ost)).format(*X2_ost), '[m]\nY2: ',('{:.3f} '*len(Y2_ost)).format(*Y2_ost), '[m]\nZ2: ',('{:.3f} '*len(Z2_ost)).format(*Z2_ost), '[m]')
-        # return(znie_odl_ost,znie_pol_ost) 
+        return(X2_ost,Y2_ost,Z2_ost) 
       
 if __name__=='__main__':
       
@@ -871,10 +887,7 @@ if __name__=='__main__':
     proba7 = skrypt(x2000 = 5906044.038,y2000 = 6481105.250,x2000_2 = 5895976.242,y2000_2 = 6498384.639)
     proba7.Azymut()
     
-    proba8 = skrypt(p=[0.000002, 0.000001, -0.000002, '-0 0 2', '0 0 0.5', '0 0 1', 100, 200, -300],
-                    X=5500000, 
-                    Y=4350000,
-                    Z=3125000)
+    proba8 = skrypt(p=[0.000002, 0.000001, -0.000002, '-0 0 2', '0 0 0.5', '0 0 1', 100, 200, -300],X=5500000, Y=4350000,Z=3125000)
     proba8.Transformacja()
 
     
