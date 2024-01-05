@@ -359,7 +359,7 @@ class funkcje():
             Aab = Aab + 2*pi
         return(sab,Aab,Aba)
     
-    def sigma(self,f, a, e2):
+    def __sigma(self,f, a, e2):
         A0 = 1 - e2/4 - 3 * e2**2/64 - 5 * e2**3/256
         A2 = (3/8) * (e2 + e2**2/4 + 15*e2**3/128)
         A4 = (15/256) * (e2**2 + (3 * e2**3)/4)
@@ -367,12 +367,12 @@ class funkcje():
         sigma = a * (A0*f - A2*sin(2*f) + A4*sin(4*f) - A6*sin(6*f))
         return(sigma)
     
-    def f1(self,xgk, a, e2):
+    def __f1(self,xgk, a, e2):
         A0 = 1 - e2/4 - 3 * e2**2/64 - 5 * e2**3/256
         f = xgk / (a * A0)
         while True:
             fs = f
-            s = self.sigma(f, a, e2)
+            s = self.__sigma(f, a, e2)
             f = fs + ((xgk - s)/(a * A0))
             if abs(fs-f) < (0.000001/206265):
                 break
@@ -380,7 +380,8 @@ class funkcje():
     
     def fl2PL1992(self,f,l,a,e2,l0=radians(19), m0 = 0.9993):
         '''
-        Przelicza wspl elispoidalne f,l na do ukl wspl plaskich Gasussa-Krugera lub/i ukl wspl plaskich PL-1992
+        Przelicza wspl elispoidalne f,l na do ukl wspl plaskich Gasussa-Krugera 
+        lub/i ukl wspl plaskich PL-1992
 
         Parameters
         ----------
@@ -407,7 +408,7 @@ class funkcje():
         t = tan(f)
         n2 = ep2 * cos(f)**2
         N = self.Np(f,a,e2)
-        sigm = self.sigma(f,a,e2)
+        sigm = self.__sigma(f,a,e2)
         xgk = sigm + (dl**2/2) * N * sin(f)*cos(f)*(1 + (dl**2/12)*cos(f)**2*(5-t**2+9*n2+4*n2**2)+ ((dl**4)/360)*cos(f)**4*(61 - 58*t**2 + t**4 + 270*n2 - 330*n2*t**2))
         ygk = dl*N*cos(f)*(1+(dl**2/6)*cos(f)**2*(1 - t**2 + n2) + (dl**4/120)*cos(f)**4*(5 - 18*t**2 + t**4 + 14*n2 - 58*n2*t**2))
         x92 = xgk * m0 - 5300000
@@ -415,20 +416,39 @@ class funkcje():
         return(x92,y92,xgk,ygk)
         
     def fl2GK(self,fa,la,a,e2,l0=radians(19)):
+        '''
+        Przelicza wspl elispoidalne f,l na do ukl wspl plaskich Gasussa-Krugera 
+
+        Parameters
+        ----------
+        fa : wspl fi (szerokosc geo.) [rad]
+        la : wspl lambda (dlugosc geo.) [rad]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+        l0 : wartosc poludnika zerowego odwzorownia PL-1992 [rad]
+             The default is radians(19).
+
+        Returns
+        -------
+        x: wspl x w G-K [m]
+        y: wspl y w G-K [m]
+
+        '''
         b2=a**2*(1-e2)
         e_2=(a**2-b2)/b2
         dl=la-l0
         t=tan(fa)
         n2=e_2*cos(fa)**2
         N=self.Np(fa,a,e2)
-        sigm=self.sigma(fa,a, e2)
+        sigm=self.__sigma(fa,a, e2)
         x=sigm+(dl**2/2)*N*sin(fa)*cos(fa)*(1+(dl**2/12)*(cos(fa))**2*(5-t**2+9*n2+4*n2**2)+(dl**4/360)*(cos(fa))**4*(61-58*t**2+t**4+270*n2-330*n2*t**2))
         y=dl*N*cos(fa)*(1+(dl**2/6)*(cos(fa))**2*(1-t**2+n2)+(dl**4/120)*(cos(fa))**4*(5-18*t**2+t**4+14*n2-58*n2*t**2))
         return(x,y)
     
     def PL19922fl(self,x,y,a,e2,l0=radians(19),m0=0.9993):
         '''
-        Przelicza wspl w ukl wspl plaskich PL-1992 do wspl elipsoidalnych f,l lub/i wspl w ukl wspl plaskich Gaussa-Krugera x,y
+        Przelicza wspl w ukl wspl plaskich PL-1992 do wspl elipsoidalnych f,l 
+        lub/i wspl w ukl wspl plaskich Gaussa-Krugera x,y
 
         Parameters
         ----------
@@ -451,7 +471,7 @@ class funkcje():
         '''
         xgk = (x + 5300000)/m0
         ygk = (y - 500000)/m0
-        fi1 = self.f1(xgk,a,e2)
+        fi1 = self.__f1(xgk,a,e2)
         N1 = self.Np(fi1,a,e2)
         M1 = self.Mp(fi1,a,e2)
         t = tan(fi1)
@@ -463,13 +483,31 @@ class funkcje():
         return(fi,lam,xgk,ygk)
     
     def GK2fl(self,x,y,a,e2,l0=radians(19)):
+        '''
+        Przelicza wspl w ukl wspl plaskich G-K do wspl elipsoidalnych f,l
+
+        Parameters
+        ----------
+        x: wspl x w G-K [m]
+        y: wspl y w G-K [m]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+        l0 : wartosc poludnika zerowego odwzorownia PL-1992 [rad]
+             The default is radians(19).
+
+        Returns
+        -------
+        f : wspl fi (szerokosc geo.) [rad]
+        l : wspl lambda (dlugosc geo.) [rad]
+
+        '''
         b2=a**2*(1-e2)
         e_2=(a**2-b2)/b2
         A0=1-e2/4-3*e2**2/64-5*e2**3/256
         fl=x/(a*A0)
         while True:
             fs=fl
-            sigm=self.sigma(fl,a,e2)
+            sigm=self.__sigma(fl,a,e2)
             fl=fl+(x-sigm)/(a*A0)
             if abs( fl-fs)<(0.000001/206265):
                 break
@@ -520,7 +558,7 @@ class funkcje():
         t = tan(f)
         n2 = ep2 * cos(f)**2
         N = self.Np(f,a,e2)
-        sigm = self.sigma(f,a,e2)
+        sigm = self.__sigma(f,a,e2)
         xgk = sigm + (dl**2/2) * N * sin(f)*cos(f)*(1 + (dl**2/12)*cos(f)**2*(5-t**2+9*n2+4*n2**2)+ ((dl**4)/360)*cos(f)**4*(61 - 58*t**2 + t**4 + 270*n2 - 330*n2*t**2))
         ygk = dl*N*cos(f)*(1+(dl**2/6)*cos(f)**2*(1 - t**2 + n2) + (dl**4/120)*cos(f)**4*(5 - 18*t**2 + t**4 + 14*n2 - 58*n2*t**2))
         x2000 = xgk * m0
@@ -614,7 +652,7 @@ class funkcje():
             l0 = radians(24)
         xgk = x20/m0
         ygk = (y20 - 500000 - ns*1000000)/m0
-        fi1 = self.f1(xgk,a,e2)
+        fi1 = self.__f1(xgk,a,e2)
         N1 = self.Np(fi1,a,e2)
         M1 = self.Mp(fi1,a,e2)
         t = tan(fi1)
@@ -626,6 +664,22 @@ class funkcje():
         return(fi,lam,xgk,ygk)
     
     def mgk(self,xgk,ygk,a,e2):
+        '''
+        Oblicza skale ukladu G-K
+        (potrzebne przy liczeniu znieksztalcen)
+
+        Parameters
+        ----------
+        xgk: wspl x w G-K [m]
+        ygk: wspl y w G-K [m]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+
+        Returns
+        -------
+        m: skala ukladu G-K
+
+        '''
         f = f1(xgk,a,e2)
         R = np.sqrt(Np(f, a, e2) * Mp(f, a, e2))
         m = 1 + ygk**2 / (2 * R**2) + ygk**4 / (24 * R**4)
@@ -682,6 +736,30 @@ class funkcje():
         return(r,sgk)
     
     def redu_d(self,xa, xb, ya, yb, ha, hb, spom, l0, a, e2):
+        '''
+        przelicza odleglosc pomierona na odleglosc skosna oraz elipsoidalna przy
+        pomocy redukcji na podstawie podanych wspl plaskich w G-K pkt poczatkowego
+        i koncowego oraz ich wysokosci
+
+        Parameters
+        ----------
+        xa : wspl x pkt A w G-K [m]
+        ya : wspl y pkt A w G-K [m]
+        xb : wspl x pkt B w G-K [m]
+        yb : wspl y pkt B w G-K [m]
+        ha : wys w pkt A [m]
+        hb : wys w pkt B [m]
+        spom : dlugosc pomierzona [m]
+        l0 : poludnik zerowy [rad]
+        a : stala elipsoidy
+        e2 : stala elipsoidy
+
+        Returns
+        -------
+        s0: dlugosc skosna [m]
+        selip: dlugosc na elipsoidzie (dlugosc lini geodezyjnej) [m]
+
+        '''
         xm = (xa + xb) / 2
         ym = (ya + yb) /2
         fm, lm = self.GK2fl(xm,ym,a,e2,l0)
@@ -691,20 +769,20 @@ class funkcje():
         selip = 2 * Rm * asin(s0/(2*Rm))
         return(s0, selip)
     
-    def red_odl_skosnej(self,x,y,h,s,z,beta,i,l,a,e2):
-        Xp = x + s*np.sin(z) *np.cos(beta)
-        Yp = y + s*np.sin(z) *np.sin(beta)
-        hp = h + i + s*np.cos(z) - l
-        Xm = (x + Xp)/2
-        Ym = (y + Yp)/2
-        fm, lm = GK2fl(Xm,Ym,a,e2)
-        Nm = Np(fm, a, e2)
-        Mm = Mp(fm, a, e2)
-        Rm = np.sqrt(Nm * Mm)
-        Ha = h  + i
-        Hb = hp + l
-        s0 = np.sqrt((s**2 - (Hb - Ha)**2)/(1+(Ha/Rm)*(1 + (Hb/Rm))))
-        return(s0, Xp, Yp)
+    # def red_odl_skosnej(self,x,y,h,s,z,beta,i,l,a,e2):
+    #     Xp = x + s*np.sin(z) *np.cos(beta)
+    #     Yp = y + s*np.sin(z) *np.sin(beta)
+    #     hp = h + i + s*np.cos(z) - l
+    #     Xm = (x + Xp)/2
+    #     Ym = (y + Yp)/2
+    #     fm, lm = GK2fl(Xm,Ym,a,e2)
+    #     Nm = Np(fm, a, e2)
+    #     Mm = Mp(fm, a, e2)
+    #     Rm = np.sqrt(Nm * Mm)
+    #     Ha = h  + i
+    #     Hb = hp + l
+    #     s0 = np.sqrt((s**2 - (Hb - Ha)**2)/(1+(Ha/Rm)*(1 + (Hb/Rm))))
+    #     return(s0, Xp, Yp)
     
     def zbiez_pld(self,xgk,ygk,a,e2):
         '''
@@ -722,7 +800,7 @@ class funkcje():
         gamma: kat zbieznosci poludnikow w pkt [rad]
 
         '''
-        fi1 = self.f1(xgk,a,e2)
+        fi1 = self.__f1(xgk,a,e2)
         N1 = self.Np(fi1,a,e2)
         t = tan(fi1)
         b2 = a**2*(1-e2)
@@ -760,6 +838,23 @@ class funkcje():
         return(delta)
     
     def azymut(self,xa,ya,xb,yb):
+        '''
+        Oblicza azymut na podstawie wspl pkt poczatkowego i koncowego 
+        w zadanym ukladzie wspolrzednych plaskich
+
+        Parameters
+        ----------
+        xa : wspl x pkt A [m]
+        ya : wspl y pkt A [m]
+        xb : wspl x pkt B [m]
+        yb : wspl y pkt B [m]
+
+        Returns
+        -------
+        alfa_ab: azymut wprost [rad]
+        alfa_ba: azymut odwrotny [rad]
+
+        '''
         alfa_ab = np.arctan(((yb - ya) / (xb - xa)))
         alfa_ba = alfa_ab + np.pi
         if alfa_ab < 0:
@@ -768,19 +863,19 @@ class funkcje():
             alfa_ba += 2*pi
         return(alfa_ab,alfa_ba)
     
-    def redukcja_AZ(self,xa,ya,xb,yb,dAb,dBa,a,e2):
-        alfa_ab, alfa_ba = azymut(xa,ya,xb,yb)
-        AAb = alfa_ab + zbiez_pld(xa, ya, a, e2) + dAb
-        ABa = alfa_ba + zbiez_pld(xb, yb, a, e2) + dBa
-        if alfa_ab < 0:
-            alfa_ab += 2*pi
-        if alfa_ba < 0:
-            alfa_ba += 2*pi
-        if AAb < 0:
-            AAb += 2*pi
-        if ABa < 0:
-            ABa += 2*pi
-        return(alfa_ab,alfa_ba,AAb,ABa)
+    # def redukcja_AZ(self,xa,ya,xb,yb,dAb,dBa,a,e2):
+    #     alfa_ab, alfa_ba = azymut(xa,ya,xb,yb)
+    #     AAb = alfa_ab + zbiez_pld(xa, ya, a, e2) + dAb
+    #     ABa = alfa_ba + zbiez_pld(xb, yb, a, e2) + dBa
+    #     if alfa_ab < 0:
+    #         alfa_ab += 2*pi
+    #     if alfa_ba < 0:
+    #         alfa_ba += 2*pi
+    #     if AAb < 0:
+    #         AAb += 2*pi
+    #     if ABa < 0:
+    #         ABa += 2*pi
+    #     return(alfa_ab,alfa_ba,AAb,ABa)
     
     def bursa(self,x,p):
         '''
