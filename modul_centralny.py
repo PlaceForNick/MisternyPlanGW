@@ -258,8 +258,6 @@ class skrypt(funkcje):
         i = 0
         
         if self.f != [''] and self.l != ['']:
-            print(self.f)
-            print(self.l)
             while i < len(self.f):
                 
                 x2000,y2000,xgk,ygk = self.fl2PL2000(self.f[i], self.l[i], self.a, self.e2, self.strefa(self.l[i]))
@@ -815,14 +813,14 @@ class skrypt(funkcje):
 
     def Transformacja(self):
         '''
-        Wykonuje transformacje współrzędnych pierwotnych XYZ do układu wtótnego XYZ2 
+        Wykonuje transformacje współrzędnych pierwotnych XYZ/flh do układu wtótnego XYZ2 
         na podstawie dostępnych danych. Model transformacji wybierany jest 
         na podstawie ilości dostarczonych parametrów transformacji p:
-            -XYZ, p = [kappa x, kappa y, kappa z, alfa, beta, gamma, dx, dy, dz] 
+            -XYZ/flh, p = [kappa x, kappa y, kappa z, alfa, beta, gamma, dx, dy, dz] 
                 -> transformacja kwaziafiniczna 
-            -XYZ, p = [kappa, alfa, beta, gamma, dx, dy, dz] 
+            -XYZ/flh, p = [kappa, alfa, beta, gamma, dx, dy, dz] 
                 -> transformacja Bursa-Wolfa
-            -XYZ, p = [alfa, beta, gamma, dx, dy, dz]
+            -XYZ/flh, p = [alfa, beta, gamma, dx, dy, dz]
                 -> transformacja izometryczna
 
         Returns
@@ -832,10 +830,25 @@ class skrypt(funkcje):
         '''
         
         X2_ost = []; Y2_ost = []; Z2_ost = []
-        i = 0
-        
+                
+        if self.f != [''] and self.l != [''] and self.h != ['']:
+            
+            i = 0
+            self.X=[]
+            self.Y=[]
+            self.Z=[]
+            
+            while i < len(self.A):
+                
+                X,Y,Z = self.flh2xyz(self.f[i], self.l[i], self.h[i], self.a, self.e2)
+                self.X.append(X)
+                self.Y.append(Y)
+                self.Z.append(Z)
+                i += 1
+                
         if self.X != [''] and self.Y != [''] and self.Z != ['']:
             
+            i = 0
             while i < len(self.X):
 
                 if len(self.p[i]) == 9:
